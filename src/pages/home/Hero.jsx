@@ -44,7 +44,7 @@ export default function Hero() {
      welded to the cursor rather than chasing it. */
   const spotX = useTransform(pointerX, (v) => `${(v * 0.5 + 0.5) * 100}%`)
   const spotY = useTransform(pointerY, (v) => `${(v * 0.5 + 0.5) * 100}%`)
-  const spotlight = useMotionTemplate`radial-gradient(46rem circle at ${spotX} ${spotY}, rgb(255 106 26 / 0.11), rgb(124 92 255 / 0.05) 45%, transparent 72%)`
+  const spotlight = useMotionTemplate`radial-gradient(46rem circle at ${spotX} ${spotY}, rgb(255 255 255 / 0.09), rgb(255 255 255 / 0.03) 45%, transparent 72%)`
 
   /* The grid counter-drifts, which sells depth far better than moving the
      whole layer with the cursor. */
@@ -60,6 +60,7 @@ export default function Hero() {
       {/* ── Layer 0 · WebGL service mesh ─────────────────── */}
       <motion.div
         className="absolute inset-0"
+        data-hero-canvas=""
         style={{ scale: canvasScale, opacity: canvasOpacity, zIndex: -30 }}
       >
         <Suspense fallback={null}>

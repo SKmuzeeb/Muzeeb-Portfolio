@@ -42,17 +42,24 @@ export default function ProjectCard({ project, size = 'md', index = 0, eager = f
             />
           </div>
 
+          {/* Scrims over the cover.
+
+              These deliberately do NOT use theme tokens. The generated cover
+              art is a dark, self-contained image in both themes — artwork keeps
+              its own palette — so a themed scrim would put a cream pill on a
+              black image in light mode. Fixed dark values are correct here
+              precisely because the thing underneath never changes. */}
           <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4">
-            <span className="rounded-full border border-white/12 bg-void/65 px-2.5 py-1 font-mono text-mono text-ink-dim backdrop-blur-sm">
+            <span className="rounded-full border border-white/12 bg-black/65 px-2.5 py-1 font-mono text-mono text-white/75 backdrop-blur-sm">
               {project.index}
             </span>
-            <span className="rounded-full border border-white/12 bg-void/65 px-2.5 py-1 font-mono text-label tracking-[0.16em] text-ink-dim uppercase backdrop-blur-sm">
+            <span className="rounded-full border border-white/12 bg-black/65 px-2.5 py-1 font-mono text-label tracking-[0.16em] text-white/75 uppercase backdrop-blur-sm">
               {project.kind}
             </span>
           </div>
 
           <div className="pointer-events-none absolute inset-0 grid place-items-center">
-            <span className="flex translate-y-2 items-center gap-2 rounded-full border border-flame/60 bg-void/70 px-5 py-2.5 font-mono text-label tracking-[0.2em] text-flame uppercase opacity-0 backdrop-blur-md transition-all duration-400 group-hover:translate-y-0 group-hover:opacity-100">
+            <span className="flex translate-y-2 items-center gap-2 rounded-full border border-white/20 bg-black/70 px-5 py-2.5 font-mono text-label tracking-[0.2em] text-white uppercase opacity-0 backdrop-blur-md transition-all duration-400 group-hover:translate-y-0 group-hover:opacity-100">
               View case study
               <span className="material-symbols-outlined text-base" aria-hidden="true">arrow_outward</span>
             </span>

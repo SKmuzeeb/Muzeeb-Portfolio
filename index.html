@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -14,8 +14,32 @@
       content="Mohammad Muzeeb Shaik, Full Stack Developer, React.js, Node.js, PostgreSQL, AWS, REST API, Knex.js, SaaS, backend developer"
     />
     <meta name="author" content="Mohammad Muzeeb Shaik" />
-    <meta name="theme-color" content="#05060a" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="color-scheme" content="dark light" />
+    <script>
+      /*
+       * Applies the stored theme before first paint. Without this the page
+       * renders one frame in the default theme and then snaps, which shows a
+       * white flash to anyone who chose dark.
+       */
+      (function () {
+        try {
+          var v = localStorage.getItem('portfolio-theme')
+          if (v !== 'dark' && v !== 'light' && v !== 'system') v = 'system'
+          var t =
+            v === 'system'
+              ? matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light'
+              : v
+          document.documentElement.dataset.theme = t
+          var m = document.querySelector('meta[name="theme-color"]')
+          if (m) m.setAttribute('content', t === 'light' ? '#f2eee4' : '#000000')
+        } catch (e) {
+          document.documentElement.dataset.theme = 'dark'
+        }
+      })()
+    </script>
     <link rel="canonical" href="/" />
 
     <!-- Open Graph -->

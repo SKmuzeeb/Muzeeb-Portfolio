@@ -9,34 +9,53 @@
  * machine output. Component classes below are the shared primitives; utility
  * classes are grouped at the end.
  */
+/*
+ * THEME TOKENS
+ *
+ * Two monochrome themes rather than the old black-and-orange. Everything is
+ * expressed as a token here and nowhere else, so switching theme is a matter
+ * of redefining these variables — every utility in the project is generated as
+ * `var(--color-*)` and follows along automatically.
+ *
+ *   dark  (default) — pure black ground, white ink, white as the accent
+ *   light           — cream ground, black ink, black as the accent
+ *
+ * The single `flame` token is what used to be orange. It is kept as the name
+ * because ~200 call sites reference it and because "the accent" is the
+ * concept; its value is now simply the foreground colour of the theme.
+ */
 @theme {
   /* ── Surfaces ───────────────────────────────────────────── */
-  --color-void: #05060a;
-  --color-void-raised: #080a10;
-  --color-panel: #0c0f16;
-  --color-panel-2: #11151f;
-  --color-panel-3: #171c28;
-  --color-panel-4: #1f2532;
+  --color-void: #000000;
+  --color-void-raised: #050505;
+  --color-panel: #0a0a0a;
+  --color-panel-2: #101010;
+  --color-panel-3: #181818;
+  --color-panel-4: #222222;
 
   /* ── Ink ────────────────────────────────────────────────── */
-  --color-ink: #f5f7fb;
-  --color-ink-dim: #a4adbd;
-  --color-ink-mute: #67718a;
-  --color-ink-faint: #3d465a;
+  --color-ink: #ffffff;
+  --color-ink-dim: #d6d6d6;
+  --color-ink-mute: #a1a1a1;
+  --color-ink-faint: #6a6a6a;
 
-  /* ── Accents ────────────────────────────────────────────── */
-  --color-flame: #ff6a1a;
-  --color-flame-soft: #ffa457;
-  --color-plasma: #7c5cff;
-  --color-aqua: #22d3ee;
-  --color-lime: #a3e635;
-  --color-magenta: #f472b6;
+  /* ── Accent (was orange; now the theme's own foreground) ─── */
+  --color-flame: #ffffff;
+  --color-flame-soft: #e6e6e6;
+  --color-plasma: #d4d4d4;
+  --color-aqua: #bfbfbf;
+  --color-lime: #a8a8a8;
+  --color-magenta: #c8c8c8;
 
   /* ── Lines & glass ──────────────────────────────────────── */
-  --color-line: rgb(255 255 255 / 0.07);
-  --color-line-strong: rgb(255 255 255 / 0.14);
-  --color-line-accent: rgb(255 106 26 / 0.4);
-  --color-glass: rgb(10 12 18 / 0.72);
+  --color-line: rgb(255 255 255 / 0.13);
+  --color-line-strong: rgb(255 255 255 / 0.26);
+  --color-line-accent: rgb(255 255 255 / 0.5);
+  --color-glass: rgb(0 0 0 / 0.72);
+
+  /* Corner darkening for full-bleed panels. Its own token because the same
+     rule has to darken a black hero and merely warm a cream one. */
+  --color-shade: rgb(0 0 0 / 0.9);
 
   /* ── Typography ─────────────────────────────────────────── */
   --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
@@ -101,10 +120,12 @@
   --radius-2xl: 2rem;
 
   /* ── Elevation ──────────────────────────────────────────── */
+  /* Declared here rather than in @theme so the light theme can override them:
+     a shadow tuned for a black ground is far too heavy on cream. */
   --shadow-soft: 0 24px 70px -30px rgb(0 0 0 / 0.9);
   --shadow-panel: 0 1px 0 0 rgb(255 255 255 / 0.04) inset, 0 30px 80px -40px rgb(0 0 0 / 0.95);
-  --shadow-lift: 0 40px 90px -40px rgb(0 0 0 / 0.95), 0 0 0 1px rgb(255 106 26 / 0.22);
-  --shadow-glow: 0 0 60px -12px rgb(255 106 26 / 0.45);
+  --shadow-lift: 0 40px 90px -40px rgb(0 0 0 / 0.95), 0 0 0 1px rgb(255 255 255 / 0.22);
+  --shadow-glow: 0 0 60px -12px rgb(255 255 255 / 0.28);
 
   /* ── Stacking order ────────────────────────────────────────
      One ladder, declared once, so a dialog can never end up behind
@@ -135,6 +156,64 @@
   --animate-breathe: node-breathe 2.8s ease-in-out infinite;
   --animate-sweep: sweep 3.6s ease-in-out infinite;
   --animate-halo: halo 4.2s ease-in-out infinite;
+}
+
+/*
+ * LIGHT THEME — cream ground, black ink.
+ *
+ * Only the colour tokens are redefined. Because Tailwind generates utilities as
+ * `var(--color-*)`, every `bg-panel`, `text-ink-mute`, `border-line` and so on
+ * in the whole project flips with these, with no component touched.
+ *
+ * `color-scheme` is what makes the browser's own scrollbars, form controls and
+ * the canvas background follow the theme instead of staying dark.
+ */
+[data-theme='light'] {
+  color-scheme: light;
+
+  --color-void: #f2eee4;
+  --color-void-raised: #e9e4d6;
+  --color-panel: #faf8f1;
+  --color-panel-2: #f0ebdf;
+  --color-panel-3: #e5dfd0;
+  --color-panel-4: #d8d1bf;
+
+  --color-ink: #0b0b0b;
+  --color-ink-dim: #2f2c26;
+  --color-ink-mute: #5c574d;
+  --color-ink-faint: #8d8779;
+
+  --color-flame: #0b0b0b;
+  --color-flame-soft: #2f2c26;
+  --color-plasma: #3a372f;
+  --color-aqua: #4a463c;
+  --color-lime: #565045;
+  --color-magenta: #443f37;
+
+  --color-line: rgb(11 11 11 / 0.14);
+  --color-line-strong: rgb(11 11 11 / 0.26);
+  --color-line-accent: rgb(11 11 11 / 0.55);
+  --color-glass: rgb(242 238 228 / 0.78);
+  --color-shade: rgb(60 52 32 / 0.3);
+
+  /* Shadows on a light ground need to be far weaker and warmer than on black,
+     or every card reads as a smudge. */
+  --shadow-soft: 0 24px 60px -34px rgb(60 52 32 / 0.35);
+  --shadow-panel: 0 1px 0 0 rgb(255 255 255 / 0.7) inset, 0 18px 40px -32px rgb(60 52 32 / 0.4);
+  --shadow-lift: 0 28px 60px -30px rgb(60 52 32 / 0.45), 0 0 0 1px rgb(11 11 11 / 0.28);
+  --shadow-glow: 0 0 50px -16px rgb(11 11 11 / 0.3);
+}
+
+/* Dark is the default, but state it explicitly so the pair is symmetrical and
+   so a stale data-theme on <html> cannot leave the page unstyled. */
+[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* Native controls and the overscroll area follow the theme too. */
+::selection {
+  background: var(--color-flame);
+  color: var(--color-void);
 }
 
 @keyframes marquee {
@@ -186,24 +265,13 @@
   86%  { opacity: 1; }
   100% { transform: translateY(54px); opacity: 0; }
 }
-
-/* Layer float. Two phase variants so neighbouring layers never bob in
-   lockstep — one shared keyframe would make the field breathe as a single
-   rigid object and kill the sense of separate pieces hanging in space.
-   Transform-only, so the whole field runs on the compositor. */
-@keyframes float-a {
-  0%, 100% { transform: translate3d(0, -7px, 0) rotate(-1.1deg); }
-  50%      { transform: translate3d(0, 9px, 0) rotate(1.1deg); }
+@keyframes pk-halo {
+  0%, 100% { opacity: 0.25; transform: scale(0.6); }
+  50% { opacity: 0.85; transform: scale(1.25); }
 }
-@keyframes float-b {
-  0%, 100% { transform: translate3d(0, 9px, 0) rotate(1.3deg); }
-  50%      { transform: translate3d(0, -8px, 0) rotate(-1.3deg); }
-}
-/* Marching dash along the request path. */
 
 @layer base {
   :root {
-    color-scheme: dark;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -281,7 +349,7 @@
 
   ::selection {
     background: var(--color-flame);
-    color: #fff;
+    color: var(--color-void);
   }
 
   :focus-visible {
@@ -334,8 +402,10 @@
     color: var(--color-ink-mute);
   }
 
+  /* Monochrome, so the gradient is a fade through the theme's own greys rather
+     than a colour ramp. Works in both themes without a second definition. */
   .text-gradient {
-    background: linear-gradient(100deg, var(--color-ink) 0%, var(--color-ink) 35%, var(--color-flame) 62%, var(--color-plasma) 100%);
+    background: linear-gradient(100deg, var(--color-ink) 0%, var(--color-ink) 38%, var(--color-ink-mute) 72%, var(--color-ink-faint) 100%);
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -371,8 +441,10 @@
 
   .btn-primary {
     background: var(--color-flame);
-    color: #140701;
-    box-shadow: 0 10px 40px -14px rgb(255 106 26 / 0.8);
+    /* Inverts with the theme: black text on white in dark, cream on black in
+       light. A hardcoded value would be unreadable in one of the two. */
+    color: var(--color-void);
+    box-shadow: var(--shadow-glow);
   }
   .btn-primary::after {
     content: "";
@@ -393,7 +465,7 @@
   }
   .btn-ghost:hover {
     border-color: var(--color-line-accent);
-    background: rgb(255 106 26 / 0.07);
+    background: var(--color-line);
     transform: translateY(-2px);
   }
 
@@ -470,6 +542,14 @@
   }
 
   /* ── Misc ─────────────────────────────────────────────── */
+  /* The WebGL mesh blends additively, so it can only ever *add* light — on a
+     cream ground it would simply wash out and disappear. In the light theme it
+     gets a soft dark pool to sit in, which keeps the glow legible without
+     putting a hard black box behind the headline. */
+  [data-theme='light'] [data-hero-canvas] {
+    background: radial-gradient(58% 58% at 50% 44%, #17140f 0%, #17140f 35%, transparent 72%);
+  }
+
   /* Stack badges lift and stagger when their card is hovered. Transform-only,
      so the whole row animates on the compositor. */
   .stack-mark {
@@ -541,7 +621,7 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: radial-gradient(ellipse at 50% 45%, transparent 35%, rgb(0 0 0 / 0.55) 78%, rgb(0 0 0 / 0.9) 100%);
+    background: radial-gradient(ellipse at 50% 45%, transparent 35%, color-mix(in srgb, var(--color-shade) 61%, transparent) 78%, var(--color-shade) 100%);
   }
 
   /* ── Stacking ───────────────────────────────────────────

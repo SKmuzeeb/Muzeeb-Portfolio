@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import ThemeToggle from './ThemeToggle.jsx'
 import { navItems, profile, resume } from '../data/site.js'
 import { ProfileModalContext } from '../lib/profile-context.js'
 import { useLockBodyScroll, useEscape } from '../hooks/index.js'
@@ -174,6 +175,7 @@ export default function NavBar() {
           </nav>
 
           <div className="flex shrink-0 items-center gap-2">
+            <ThemeToggle />
             <ProfileButton className="hidden sm:grid" />
             <Link to={resume.fallbackRoute} className="btn btn-ghost hidden lg:inline-flex">
               Resume

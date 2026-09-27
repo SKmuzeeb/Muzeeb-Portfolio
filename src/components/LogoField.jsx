@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { motion, useAnimationControls, useTransform, useReducedMotion } from 'framer-motion'
+import { motion, useAnimationControls, useReducedMotion } from 'framer-motion'
 import TechBadge from './ui/TechIcon.jsx'
 import { TECH_GROUPS, TECH } from '../data/categories.js'
 import { createRng } from '../lib/prng.js'
-import { pointerX, pointerY } from '../lib/pointer.js'
 import { useMediaQuery, useIsTouch } from '../hooks/index.js'
 
 /**
@@ -59,20 +58,18 @@ const build = (keys, cols) => {
       x: (col + 0.5) * cw + (rng() - 0.5) * cw * 0.34,
       y: (row + 0.5) * ch + (rng() - 0.5) * ch * 0.3,
       z: -230 + rng() * 460,
-      dur: 5.4 + rng() * 4.6,
-      delay: -rng() * 7,
       alt: i % 2 === 0,
-      parallax: 5 + rng() * 18,
-      // Where it falls in from, and how long after the one before it.
-      drop: 90 + rng() * 120,
-      fallDelay: 0.05 + i * 0.055,
+      // Where it falls in from, how long the drop takes, and how long after
+      // the one before it. All three are per-mark, so no two land together.
+      drop: 110 + rng() * 150,
+      fallDur: 1.1 + rng() * 0.9,
+      fallDelay: 0.04 + i * 0.09,
     }
   })
 }
 
-/** Nearer marks are larger and more opaque; far ones recede. */
+/** Nearer marks are larger; far ones recede. */
 const scaleFor = (z) => 0.7 + ((z + 230) / 460) * 0.5
-const fadeFor = (z) => 0.4 + ((z + 230) / 460) * 0.6
 
 export default function LogoField({ constraintsRef }) {
   const reduced = useReducedMotion()
@@ -84,11 +81,6 @@ export default function LogoField({ constraintsRef }) {
   // Drag is pointer-only: on touch a draggable target sitting over the hero
   // would steal the page scroll from the reader.
   const draggable = !isTouch && !reduced
-
-  // While a mark is held the ambient parallax would fight the hand.
-  useEffect(() => {
-    if (grabbed) pointerX.set(0)
-  }, [grabbed])
 
   const marks = useMemo(() => {
     const set = wide ? SETS.desktop : SETS.mobile
@@ -113,56 +105,58 @@ export default function LogoField({ constraintsRef }) {
   )
 }
 
+/* Landing easing. easeInCubic accelerates the way gravity does, so a falling
+   mark speeds up as it drops instead of easing in evenly — an even ease reads
+   as a fade, not as weight. */
+const FALL = [0.33, 0, 0.67, 0]
+const RISE = [0.16, 1, 0.3, 1]
+
 function Mark({ mark, bounds, draggable, reduced, grabbed, onGrab, onRelease }) {
   const controls = useAnimationControls()
-  // A drag also ends with a click event, so the bounce needs to know whether
-  // this was a tap or the end of a throw.
+  // A drag also ends with a click event, so the fall needs to know whether this
+  // was a tap or the end of a throw.
   const dragged = useRef(false)
   const held = grabbed === mark.key
-  const still = reduced || grabbed
 
-  const px = useTransform(pointerX, [-1, 1], [-mark.parallax, mark.parallax])
-  const py = useTransform(pointerY, [-1, 1], [-mark.parallax, mark.parallax])
-
-  /* Fall in on arrival. A low-damping spring is what makes it read as a drop
-     with a settle rather than an ease — the overshoot is the whole point. */
+  /* Fall in on arrival. Deliberately NOT a spring: the brief is a slow,
+     complete drop that settles and stays put, and a spring would leave the
+     marks bobbing forever. Every mark gets its own distance, duration and
+     delay, so the field lands staggered rather than as one block. */
   useEffect(() => {
     if (reduced) return
     controls.start({
       y: [-mark.drop, 0],
       opacity: [0, 1],
       transition: {
-        type: 'spring',
-        stiffness: 130,
-        damping: 11,
-        mass: 1.1,
+        duration: mark.fallDur,
         delay: mark.fallDelay,
+        ease: FALL,
       },
     })
-  }, [controls, reduced, mark.drop, mark.fallDelay])
+  }, [controls, reduced, mark.drop, mark.fallDur, mark.fallDelay])
 
-  const bounce = () => {
+  const fall = () => {
     if (reduced || dragged.current) {
       dragged.current = false
       return
     }
-    // Up, then down squashing on impact, then settle.
+    // Lifts a little, then drops back the rest of the way slowly.
     controls.start({
-      y: [0, -62, 10, 0],
-      scaleY: [1, 1, 0.82, 1],
-      scaleX: [1, 1, 1.12, 1],
-      transition: { duration: 0.72, times: [0, 0.32, 0.52, 1], ease: 'easeOut' },
+      y: [0, -34, 0],
+      scaleY: [1, 1, 0.9, 1],
+      transition: {
+        duration: mark.fallDur * 1.5,
+        times: [0, 0.22, 0.72, 1],
+        ease: [RISE, FALL, FALL],
+      },
     })
   }
 
   return (
     <div className="absolute" style={{ left: `${mark.x}%`, top: `${mark.y}%` }}>
-      {/* 1 — parallax, depth scale, depth fade. */}
-      <motion.div
-        className="absolute"
-        animate={controls}
-        style={still ? undefined : { x: px, y: py, opacity: fadeFor(mark.z) }}
-      >
+      {/* 1 — fall and landing squash. No pointer parallax: the marks were
+          drifting on hover, which read as a screensaver rather than content. */}
+      <motion.div className="absolute" animate={controls}>
         {/* 2 — drag and release momentum.
 
             `touch-none` only when dragging is on: applied unconditionally it
@@ -181,18 +175,11 @@ function Mark({ mark, bounds, draggable, reduced, grabbed, onGrab, onRelease }) 
           }}
           onDragEnd={onRelease}
           onPointerDown={onGrab}
-          onClick={bounce}
+          onClick={fall}
           whileDrag={draggable ? { zIndex: 40 } : undefined}
         >
-          {/* 3 + 4 — the fall and the bounce are driven by the controls above;
-              the idle float is CSS on the element inside. */}
-          <div
-            className={`-translate-x-1/2 -translate-y-1/2 ${reduced ? '' : mark.alt ? 'float-b' : 'float-a'}`}
-            style={{
-              '--dur': `${mark.dur.toFixed(2)}s`,
-              animationDelay: `${mark.delay.toFixed(2)}s`,
-            }}
-          >
+          {/* 3 — no idle float. The marks land and stay where they land. */}
+          <div className="-translate-x-1/2 -translate-y-1/2">
             <TechBadge name={mark.key} size="lg" showLabel={false} />
             <span className="sr-only">{TECH[mark.key].label}</span>
           </div>
