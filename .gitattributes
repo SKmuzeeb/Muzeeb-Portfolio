@@ -1,0 +1,19 @@
+# Normalise line endings in the repository itself, and let Git handle the
+# checkout side per platform. Without this, Windows checkouts rewrite every
+# file to CRLF and the next diff on Linux or macOS is unreadable.
+* text=auto eol=lf
+
+# Binary assets must never be line-ending converted.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+
+# These are text but must stay byte-exact.
+package-lock.json -diff linguist-generated=true
+src/lib/logos.generated.js -diff linguist-generated=true

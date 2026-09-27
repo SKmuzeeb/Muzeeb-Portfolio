@@ -1,0 +1,597 @@
+@import "tailwindcss";
+
+/*
+ * SITE THEME — dark, cinematic, engineering-focused.
+ *
+ * Near-black field with one hot accent (flame) and one cool accent (plasma).
+ * Type pairs a geometric display face (Sora) with a neutral body face (Inter)
+ * and a mono face (JetBrains Mono) for anything that represents code, labels or
+ * machine output. Component classes below are the shared primitives; utility
+ * classes are grouped at the end.
+ */
+@theme {
+  /* ── Surfaces ───────────────────────────────────────────── */
+  --color-void: #05060a;
+  --color-void-raised: #080a10;
+  --color-panel: #0c0f16;
+  --color-panel-2: #11151f;
+  --color-panel-3: #171c28;
+  --color-panel-4: #1f2532;
+
+  /* ── Ink ────────────────────────────────────────────────── */
+  --color-ink: #f5f7fb;
+  --color-ink-dim: #a4adbd;
+  --color-ink-mute: #67718a;
+  --color-ink-faint: #3d465a;
+
+  /* ── Accents ────────────────────────────────────────────── */
+  --color-flame: #ff6a1a;
+  --color-flame-soft: #ffa457;
+  --color-plasma: #7c5cff;
+  --color-aqua: #22d3ee;
+  --color-lime: #a3e635;
+  --color-magenta: #f472b6;
+
+  /* ── Lines & glass ──────────────────────────────────────── */
+  --color-line: rgb(255 255 255 / 0.07);
+  --color-line-strong: rgb(255 255 255 / 0.14);
+  --color-line-accent: rgb(255 106 26 / 0.4);
+  --color-glass: rgb(10 12 18 / 0.72);
+
+  /* ── Typography ─────────────────────────────────────────── */
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --text-display: clamp(3.25rem, 12vw, 10.5rem);
+  --text-display--line-height: 0.86;
+  --text-display--letter-spacing: -0.045em;
+  --text-display--font-weight: 800;
+
+  --text-hero: clamp(2.5rem, 8vw, 7rem);
+  --text-hero--line-height: 0.92;
+  --text-hero--letter-spacing: -0.04em;
+  --text-hero--font-weight: 800;
+
+  --text-title: clamp(1.9rem, 4.4vw, 3.5rem);
+  --text-title--line-height: 1.02;
+  --text-title--letter-spacing: -0.03em;
+  --text-title--font-weight: 700;
+
+  --text-section: clamp(1.6rem, 3.4vw, 2.6rem);
+  --text-section--line-height: 1.08;
+  --text-section--letter-spacing: -0.025em;
+  --text-section--font-weight: 700;
+
+  --text-lead: clamp(1.05rem, 1.5vw, 1.3rem);
+  --text-lead--line-height: 1.6;
+  --text-lead--font-weight: 300;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.7;
+
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.55;
+
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1;
+  --text-label--letter-spacing: 0.22em;
+  --text-label--font-weight: 500;
+
+  --text-mono: 0.75rem;
+  --text-mono--line-height: 1.4;
+  --text-mono--letter-spacing: 0.04em;
+
+  /* ── Layout ─────────────────────────────────────────────── */
+  /* Section rhythm. --spacing-margin drives every section's vertical padding,
+     so it must exist as a real token rather than a dangling var() reference. */
+  --spacing-gutter: 1.75rem;
+  --spacing-edge: clamp(1.25rem, 5vw, 5.5rem);
+  --spacing-margin: clamp(4.5rem, 9vw, 9.5rem);
+  --spacing-stack: clamp(2.5rem, 5vw, 5rem);
+  --spacing-card: clamp(1.25rem, 2vw, 1.75rem);
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-DEFAULT: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+
+  /* ── Elevation ──────────────────────────────────────────── */
+  --shadow-soft: 0 24px 70px -30px rgb(0 0 0 / 0.9);
+  --shadow-panel: 0 1px 0 0 rgb(255 255 255 / 0.04) inset, 0 30px 80px -40px rgb(0 0 0 / 0.95);
+  --shadow-lift: 0 40px 90px -40px rgb(0 0 0 / 0.95), 0 0 0 1px rgb(255 106 26 / 0.22);
+  --shadow-glow: 0 0 60px -12px rgb(255 106 26 / 0.45);
+
+  /* ── Stacking order ────────────────────────────────────────
+     One ladder, declared once, so a dialog can never end up behind
+     the page or in front of the lightbox. Decorative bleed layers
+     sit at a NEGATIVE index and only work inside an `isolate`
+     section (see `.bleed`) — otherwise they fall behind <body>. */
+  --z-decor: -1;
+  --z-base: 0;
+  --z-content: 10;
+  --z-raised: 20;
+  --z-progress: 50;
+  --z-header: 60;
+  --z-drawer: 70;
+  --z-modal: 80;
+  --z-lightbox: 90;
+  --z-skip: 100;
+
+  /* ── Motion ─────────────────────────────────────────────── */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
+
+  --animate-marquee: marquee 32s linear infinite;
+  --animate-drift: drift 9s ease-in-out infinite;
+  --animate-pulse-ring: pulse-ring 2.6s ease-out infinite;
+  --animate-scan: scan 5s linear infinite;
+  --animate-shimmer: shimmer 2.4s linear infinite;
+  --animate-dash: dash-travel 1.6s linear infinite;
+  --animate-breathe: node-breathe 2.8s ease-in-out infinite;
+  --animate-sweep: sweep 3.6s ease-in-out infinite;
+  --animate-halo: halo 4.2s ease-in-out infinite;
+}
+
+@keyframes marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+@keyframes drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(0, -18px, 0) scale(1.04); }
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.82); opacity: 0.7; }
+  70% { transform: scale(1.7); opacity: 0; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+@keyframes scan {
+  0% { transform: translateY(-120%); }
+  100% { transform: translateY(420%); }
+}
+@keyframes shimmer {
+  0% { background-position: -160% 0; }
+  100% { background-position: 260% 0; }
+}
+
+/* ── Flow keyframes ──────────────────────────────────────
+   Used by the live request-path visuals: a marching dash for the
+   connector, a travelling highlight for the active node, and a slow
+   sweep that makes a static panel feel alive without a repaint. */
+@keyframes dash-travel {
+  to { stroke-dashoffset: -240; }
+}
+@keyframes node-breathe {
+  0%, 100% { opacity: 0.32; }
+  50% { opacity: 1; }
+}
+@keyframes sweep {
+  0% { transform: translate3d(-120%, 0, 0); }
+  100% { transform: translate3d(120%, 0, 0); }
+}
+@keyframes halo {
+  0%, 100% { opacity: 0.25; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.12); }
+}
+/* Packet travelling a connector. Uses transform (not `top`) so the whole
+   animation stays on the compositor. */
+@keyframes pk {
+  0%   { transform: translateY(-6px); opacity: 0; }
+  14%  { opacity: 1; }
+  86%  { opacity: 1; }
+  100% { transform: translateY(54px); opacity: 0; }
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    --nav-h: 4.75rem;
+  }
+
+  html {
+    min-width: 320px;
+    background: var(--color-void);
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable;
+    scroll-padding-top: calc(var(--nav-h) + 1.5rem);
+  }
+
+  body {
+    min-width: 320px;
+    min-height: 100svh;
+    margin: 0;
+    overflow-x: hidden;
+    background: var(--color-void);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+  }
+
+  #root {
+    min-height: 100svh;
+    isolation: isolate;
+  }
+
+  h1, h2, h3, h4, h5, h6, p, figure, blockquote {
+    margin: 0;
+  }
+
+  ul, ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button, input, textarea, select {
+    font: inherit;
+    color: inherit;
+  }
+
+  img, svg, video, canvas {
+    display: block;
+    max-width: 100%;
+  }
+
+  ::selection {
+    background: var(--color-flame);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-flame);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-void);
+  }
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid var(--color-void);
+    border-radius: 9999px;
+    background: var(--color-panel-4);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-flame);
+  }
+}
+
+@layer components {
+  /* ── Layout shell ─────────────────────────────────────── */
+  .shell {
+    width: 100%;
+    max-width: 96rem;
+    margin-inline: auto;
+    padding-inline: var(--spacing-edge);
+  }
+
+  .hairline {
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, var(--color-line-strong) 18%, var(--color-line-strong) 82%, transparent);
+  }
+
+  /* ── Type helpers ─────────────────────────────────────── */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-ink-mute);
+  }
+
+  .text-gradient {
+    background: linear-gradient(100deg, var(--color-ink) 0%, var(--color-ink) 35%, var(--color-flame) 62%, var(--color-plasma) 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .outline-text {
+    color: transparent;
+    -webkit-text-stroke: 1px var(--color-ink-faint);
+  }
+
+  /* ── Buttons ──────────────────────────────────────────── */
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.9rem 1.6rem;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+    overflow: hidden;
+    isolation: isolate;
+    transition: color 320ms var(--ease-out-expo), border-color 320ms var(--ease-out-expo),
+      transform 320ms var(--ease-out-expo), box-shadow 320ms var(--ease-out-expo);
+  }
+
+  .btn-primary {
+    background: var(--color-flame);
+    color: #140701;
+    box-shadow: 0 10px 40px -14px rgb(255 106 26 / 0.8);
+  }
+  .btn-primary::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(100deg, var(--color-flame), #ffb066);
+    opacity: 0;
+    transition: opacity 320ms var(--ease-out-expo);
+  }
+  .btn-primary:hover { transform: translateY(-2px); }
+  .btn-primary:hover::after { opacity: 1; }
+
+  .btn-ghost {
+    border-color: var(--color-line-strong);
+    color: var(--color-ink);
+    background: rgb(255 255 255 / 0.02);
+  }
+  .btn-ghost:hover {
+    border-color: var(--color-line-accent);
+    background: rgb(255 106 26 / 0.07);
+    transform: translateY(-2px);
+  }
+
+  .btn-quiet {
+    padding: 0.5rem 0;
+    color: var(--color-ink-dim);
+    border-radius: 0;
+  }
+  .btn-quiet:hover { color: var(--color-flame); }
+
+  /* ── Chips / tags ─────────────────────────────────────── */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--color-line);
+    border-radius: 9999px;
+    background: rgb(255 255 255 / 0.025);
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-dim);
+  }
+
+  /* ── Links ────────────────────────────────────────────── */
+  .link-underline {
+    position: relative;
+    display: inline-block;
+  }
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 420ms var(--ease-out-expo);
+  }
+  .link-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* ── Cards ────────────────────────────────────────────── */
+  .lift {
+    transition: transform 500ms var(--ease-out-expo), border-color 500ms var(--ease-out-expo),
+      box-shadow 500ms var(--ease-out-expo);
+    will-change: transform;
+  }
+  .lift:hover {
+    transform: translate3d(0, -6px, 0);
+    border-color: var(--color-line-accent);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .image-zoom {
+    overflow: hidden;
+  }
+  /* Descendant, not child: the project cover nests its <img> inside a ratio
+     wrapper, while DiagramImage renders it directly. Both must still zoom. */
+  .image-zoom img,
+  .image-zoom svg {
+    transition: transform 900ms var(--ease-out-expo), filter 600ms var(--ease-out-expo);
+    will-change: transform;
+  }
+  .group:hover .image-zoom img,
+  .group:hover .image-zoom svg {
+    transform: scale(1.07);
+  }
+
+  /* ── Misc ─────────────────────────────────────────────── */
+  /* Stack badges lift and stagger when their card is hovered. Transform-only,
+     so the whole row animates on the compositor. */
+  .stack-mark {
+    transition: transform 420ms var(--ease-out-expo);
+    will-change: transform;
+  }
+  .group:hover .stack-mark,
+  .group:focus-visible .stack-mark {
+    transform: translateY(-4px) scale(1.12);
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: var(--animate-marquee);
+  }
+
+  .hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* ── Surfaces ─────────────────────────────────────────── */
+  .panel {
+    position: relative;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(180deg, var(--color-panel-2), var(--color-panel));
+    box-shadow: var(--shadow-panel);
+  }
+
+  /* Surface + interactive card in one, so padding/radius/hover stay
+     identical across every grid on the site. */
+  .card {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-card);
+    background: linear-gradient(180deg, var(--color-panel-2), var(--color-panel));
+    box-shadow: var(--shadow-panel);
+    transition:
+      transform 500ms var(--ease-out-expo),
+      border-color 500ms var(--ease-out-expo),
+      box-shadow 500ms var(--ease-out-expo),
+      background-color 500ms var(--ease-out-expo);
+  }
+  .card:hover {
+    transform: translate3d(0, -6px, 0);
+    border-color: var(--color-line-accent);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .grid-field {
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+    background-size: 72px 72px;
+  }
+
+  .vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 45%, transparent 35%, rgb(0 0 0 / 0.55) 78%, rgb(0 0 0 / 0.9) 100%);
+  }
+
+  /* ── Stacking ───────────────────────────────────────────
+     A section holding a negative-z decorative layer MUST establish a
+     stacking context, otherwise the layer escapes and is painted
+     behind the <body> background — which reads as a missing effect. */
+  .bleed {
+    position: relative;
+    isolation: isolate;
+  }
+  .bleed-decor {
+    position: absolute;
+    inset: 0;
+    z-index: var(--z-decor);
+    pointer-events: none;
+  }
+
+  .z-progress { z-index: var(--z-progress); }
+  .z-header   { z-index: var(--z-header); }
+  .z-drawer   { z-index: var(--z-drawer); }
+  .z-modal    { z-index: var(--z-modal); }
+  .z-lightbox { z-index: var(--z-lightbox); }
+  .z-skip     { z-index: var(--z-skip); }
+
+  /* Overlays sit above the sticky header, so lock their own stacking
+     context to keep content from leaking through on scroll. */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    isolation: isolate;
+  }
+  .overlay-scrim {
+    position: absolute;
+    inset: 0;
+    cursor: default;
+  }
+  .overlay-panel {
+    position: relative;
+    z-index: var(--z-content);
+  }
+}
+
+@layer utilities {
+  .mask-fade-b {
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  }
+
+  .mask-fade-r {
+    -webkit-mask-image: linear-gradient(to right, #000 82%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 82%, transparent 100%);
+  }
+
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+}
+
+.material-symbols-outlined {
+  display: inline-block;
+  flex: 0 0 auto;
+  font-family: "Material Symbols Outlined";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: normal;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "liga";
+}
+
+@media (max-width: 767px) {
+  :root { --nav-h: 4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .marquee-track { animation: none; }
+}
+
