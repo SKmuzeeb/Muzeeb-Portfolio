@@ -1,6 +1,6 @@
-# Portfolio — Mohammad Muzeeb Shaik
+﻿# Portfolio â€” Mohammad Muzeeb Shaik
 
-A dark, cinematic portfolio for a **Full Stack Developer** — React.js, Node.js,
+A dark, cinematic portfolio for a **Full Stack Developer** â€” React.js, Node.js,
 PostgreSQL, AWS, REST APIs and third-party integrations.
 
 Built with Vite, React 19, Tailwind CSS v4, React Router, Framer Motion and
@@ -23,20 +23,20 @@ npm run lint       # eslint
 ## Before you deploy
 
 Everything that is intentionally blank is marked in `src/data/site.js`. Nothing
-on this site is invented — blank values render as neutral text rather than dead
+on this site is invented â€” blank values render as neutral text rather than dead
 links or fake data.
 
 | What | Where | Current value |
 | --- | --- | --- |
-| Email address | `profile.email` | `null` — every CTA routes to `/contact` until set |
-| LinkedIn / GitHub | `socials[].href` | `null` — rendered as plain labels, not links |
-| Resume PDF | `resume.file` | `null` — `/resume` prints to a clean A4 document instead |
-| Employment dates | `experience[].period` | `null` — dates appear automatically once set |
+| Email address | `profile.email` | `null` â€” every CTA routes to `/contact` until set |
+| LinkedIn / GitHub | `socials[].href` | `null` â€” rendered as plain labels, not links |
+| Resume PDF | `resume.file` | `null` â€” `/resume` prints to a clean A4 document instead |
+| Employment dates | `experience[].period` | `null` â€” dates appear automatically once set |
 
 ```js
 // src/data/site.js
-export const profile = { /* … */ email: 'you@example.com' }
-export const resume  = { /* … */ file: '/resume.pdf' }   // drop the PDF in /public
+export const profile = { /* â€¦ */ email: 'you@example.com' }
+export const resume  = { /* â€¦ */ file: '/resume.pdf' }   // drop the PDF in /public
 export const socials = [
   { label: 'LinkedIn', handle: '@you', href: 'https://linkedin.com/in/you', icon: 'linkedin' },
   { label: 'GitHub',   handle: '@you', href: 'https://github.com/you',     icon: 'github' },
@@ -53,7 +53,7 @@ kilobytes, and can never drift out of sync with the write-up.
 
 ```
 src/lib/
-  diagram.js              render() — memoised, returns a data URI
+  diagram.js              render() â€” memoised, returns a data URI
   diagram/primitives.js   frame, node, arrows, blueprint grid, motion
   diagram/schemas.js      8 diagram types
   prng.js                 seeded PRNG (deterministic output)
@@ -77,13 +77,13 @@ src/
     three/HeroScene.jsx   WebGL service-mesh hero (lazy loaded)
     ui/                   Reveal/RevealCard, Parallax, DiagramImage, TechBadge
     ProjectStack.jsx      a project's stack, grouped by layer
-    StackLayers.jsx       animated full-stack column (About hero)
+    LogoField.jsx         floating 3D constellation of every brand mark
     ArchitectureFlow.jsx  animated request path for the Tech Stack page
     SystemWalkthrough.jsx stepped request walkthrough
     ProfileModalProvider  quick technical profile sheet
   lib/
     logos.js              official brand marks (Simple Icons, CC0) + aliases
-    logos.generated.js    GENERATED — do not hand-edit, see scripts/gen-logos.cjs
+    logos.generated.js    GENERATED â€” do not hand-edit, see scripts/gen-logos.cjs
     covers.js             per-project cover art (logos / wordmark / glyph)
     diagram.js            architecture diagram generator
   data/
@@ -96,8 +96,8 @@ src/
   pages/                  one directory per route, lazy loaded
 ```
 
-Routes: `/` · `/about` · `/experience` · `/projects` · `/projects/:slug` ·
-`/tech-stack` · `/case-studies` · `/contact` · `/resume` · `*` (404)
+Routes: `/` Â· `/about` Â· `/experience` Â· `/projects` Â· `/projects/:slug` Â·
+`/tech-stack` Â· `/case-studies` Â· `/contact` Â· `/resume` Â· `*` (404)
 
 ---
 
@@ -118,7 +118,7 @@ percentage skill bars, no fabricated URLs, and every category filter populated.
 
 - three.js (~190 kB gzipped) is lazy loaded and only fetched on the home page.
 - All other routes are code-split via `React.lazy`.
-- Diagrams are SVG data URIs — no image requests, no decode cost.
+- Diagrams are SVG data URIs â€” no image requests, no decode cost.
 - The WebGL render loop suspends when the hero scrolls out of view or the tab
   is hidden.
 - Hover effects (the request-flow preview) are never mounted on touch devices.
@@ -130,3 +130,4 @@ percentage skill bars, no fabricated URLs, and every category filter populated.
 The site uses client-side routing. Configure your host to fall back to
 `index.html` for unknown paths (`vercel.json`, Netlify `_redirects`, or
 `try_files $uri /index.html` on nginx). `vite preview` already does this.
+

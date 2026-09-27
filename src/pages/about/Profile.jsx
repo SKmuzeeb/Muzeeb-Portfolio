@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import Reveal, { RevealCard } from '../../components/ui/Reveal.jsx'
 import TechBadge from '../../components/ui/TechIcon.jsx'
-import StackField from '../../components/StackField.jsx'
+import LogoField from '../../components/LogoField.jsx'
 import { profile, resume, availability } from '../../data/site.js'
 import { bio, journey, proficiency, exploring } from '../../data/about.js'
 import { TECH } from '../../data/categories.js'
@@ -64,7 +64,7 @@ export function AboutHero() {
               <div className="grid-field absolute inset-0 opacity-20" />
             </div>
             <div className="relative">
-              <StackField />
+              <LogoField />
             </div>
           </div>
         </RevealCard>
