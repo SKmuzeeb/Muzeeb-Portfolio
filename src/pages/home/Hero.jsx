@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform, useMotionTemplate, useReducedMotion } from 'framer-motion'
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion'
 import { lazy, Suspense, useRef } from 'react'
 import HeroContent from './HeroContent.jsx'
 import { useParallax } from '../../hooks/index.js'
@@ -14,14 +14,19 @@ const HeroScene = lazy(() => import('../../components/three/HeroScene.jsx'))
  * A single copy column — the decorative floating cards that used to sit in a
  * second column were overlapping the copy and the header, so they are gone.
  *
- * Everything behind the copy is one continuous background that responds to the
- * pointer at four different depths, so a drag pulls the whole field apart
- * rather than sliding one flat image around:
+ * Behind the copy is one continuous background responding to the pointer at
+ * several depths, so a drag pulls the field apart rather than sliding one flat
+ * image around:
  *
  *   - the WebGL service mesh (also driven by the shared pointer store)
- *   - a cursor spotlight that tracks the pointer 1:1
  *   - a grid field that counter-drifts on a slower spring
- *   - two large accent glows at different depths
+ *   - three large accent glows at different depths
+ *
+ * There is deliberately NO layer that paints a shade under the pointer. A
+ * radial gradient tracking the cursor reads as a smudge sliding around the
+ * page rather than as depth, and on the cream theme it reads as a black stain
+ * following the mouse — which looked like a rendering fault, not a design.
+ * Depth here comes from parallax and the mesh rotating, not from a shadow.
  *
  * The section is `isolate`d, so the negative-z layers stay inside it instead
  * of escaping behind the page background.
@@ -39,17 +44,6 @@ export default function Hero() {
   const contentOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0])
   const canvasScale = useTransform(scrollYProgress, [0, 1], [1, 1.22])
   const canvasOpacity = useTransform(scrollYProgress, [0, 0.9], [1, 0])
-
-  /* Cursor spotlight — tracks the pointer 1:1 with no spring, so it feels
-     welded to the cursor rather than chasing it.
-
-     Built from a CSS variable rather than a literal colour. Additive white
-     light is invisible on cream, so the light theme swaps it for a warm
-     stain; the browser resolves the variable at paint time, so this stays
-     correct when the theme changes without a re-render. */
-  const spotX = useTransform(pointerX, (v) => `${(v * 0.5 + 0.5) * 100}%`)
-  const spotY = useTransform(pointerY, (v) => `${(v * 0.5 + 0.5) * 100}%`)
-  const spotlight = useMotionTemplate`radial-gradient(46rem circle at ${spotX} ${spotY}, var(--color-spot) 0%, color-mix(in srgb, var(--color-spot) 45%, transparent) 45%, transparent 72%)`
 
   /* The grid counter-drifts, which sells depth far better than moving the
      whole layer with the cursor. */
@@ -73,15 +67,7 @@ export default function Hero() {
         </Suspense>
       </motion.div>
 
-      {/* ── Layer 1 · cursor spotlight ───────────────────── */}
-      <div className="bleed-decor" aria-hidden="true">
-        <motion.div
-          className="absolute inset-0"
-          style={{ background: reduced ? undefined : spotlight }}
-        />
-      </div>
-
-      {/* ── Layer 2 · grid field + accent glows ──────────── */}
+      {/* ── Layer 1 · grid field + accent glows ──────────── */}
       <div className="bleed-decor" style={{ zIndex: -20 }} aria-hidden="true">
         <motion.div
           className="grid-field absolute -inset-16 opacity-45 mask-fade-b"

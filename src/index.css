@@ -57,10 +57,9 @@
      rule has to darken a black hero and merely warm a cream one. */
   --color-shade: rgb(0 0 0 / 0.9);
 
-  /* Blueprint grid line, and the cursor spotlight. Both are additive white on
-     black, so both need a different value in the light theme to stay visible. */
+  /* Blueprint grid line. It is drawn in white on black, so the light theme
+     flips it to a dark line — the same drawing, inked onto paper. */
   --color-grid: rgb(255 255 255 / 0.035);
-  --color-spot: rgb(255 255 255 / 0.1);
 
   /* ── Typography ─────────────────────────────────────────── */
   --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
@@ -209,10 +208,6 @@
      literally invisible, so it flips to a dark line — the same drawing, inked
      onto paper instead of chalked onto a wall. */
   --color-grid: rgb(16 13 8 / 0.055);
-
-  /* The cursor spotlight is additive light, which cannot darken. On cream it
-     has to become a warm stain that follows the pointer instead of a glow. */
-  --color-spot: rgb(74 63 42 / 0.13);
 
   /* Shadows on a light ground need to be far weaker and warmer than on black,
      or every card reads as a smudge. */
