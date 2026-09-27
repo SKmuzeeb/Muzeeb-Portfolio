@@ -28,44 +28,52 @@ export function AboutHero() {
         <div className="absolute right-1/4 bottom-0 h-[26rem] w-[26rem] rounded-full bg-plasma/10 blur-[140px]" />
       </div>
 
-      {/* The marks float across the whole hero rather than sitting in a card
-          beside the copy, and the hero is what bounds a thrown one. */}
-      <div className="absolute inset-0 z-0">
-        <LogoField constraintsRef={heroRef} />
-      </div>
-
+      {/* The marks fill only the empty side of the hero. This used to be a
+          full-bleed layer behind the text, which made the headline compete
+          with the logos for legibility. */}
       <div className="shell relative z-10 py-(--spacing-margin)">
-        <div className="max-w-3xl">
-          <Reveal>
-            <p className="eyebrow">
-              <span className="inline-block h-1.5 w-1.5 animate-pulse-ring rounded-full bg-lime" />
-              About me
-            </p>
-          </Reveal>
-          <Reveal delay={0.06}>
-            <h1 className="mt-6 font-display text-title font-extrabold text-balance">
-              Full stack developer working across{' '}
-              <span className="text-gradient">interfaces, services and data.</span>
-            </h1>
-          </Reveal>
-          <Reveal delay={0.14}>
-            <p className="mt-6 max-w-xl text-lead font-light text-ink-dim text-pretty">
-              {profile.summary}
-            </p>
-          </Reveal>
+        <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="min-w-0">
+            <Reveal>
+              <p className="eyebrow">
+                <span className="inline-block h-1.5 w-1.5 animate-pulse-ring rounded-full bg-lime" />
+                About me
+              </p>
+            </Reveal>
+            <Reveal delay={0.06}>
+              <h1 className="mt-6 font-display text-title font-extrabold text-balance">
+                Full stack developer working across{' '}
+                <span className="text-gradient">interfaces, services and data.</span>
+              </h1>
+            </Reveal>
+            <Reveal delay={0.14}>
+              <p className="mt-6 max-w-xl text-lead font-light text-ink-dim text-pretty">
+                {profile.summary}
+              </p>
+            </Reveal>
 
-          <Reveal delay={0.22}>
-            <div className="mt-9 flex flex-wrap gap-4">
-              <Link to="/projects" className="btn btn-primary">
-                See my work
-                <span className="material-symbols-outlined text-base" aria-hidden="true">arrow_outward</span>
-              </Link>
-              <Link to={resume.fallbackRoute} className="btn btn-ghost">
-                Download resume
-                <span className="material-symbols-outlined text-base" aria-hidden="true">download</span>
-              </Link>
+            <Reveal delay={0.22}>
+              <div className="mt-9 flex flex-wrap gap-4">
+                <Link to="/projects" className="btn btn-primary">
+                  See my work
+                  <span className="material-symbols-outlined text-base" aria-hidden="true">arrow_outward</span>
+                </Link>
+                <Link to={resume.fallbackRoute} className="btn btn-ghost">
+                  Download resume
+                  <span className="material-symbols-outlined text-base" aria-hidden="true">download</span>
+                </Link>
+              </div>
+            </Reveal>
+          </div>
+
+          {/* Empty space beside the copy. No border, no panel — the marks are
+              the content, so wrapping them in a box would only box them in
+              again. Height reserves the room they fall into. */}
+          <div className="pointer-events-none relative hidden h-[24rem] lg:block">
+            <div className="pointer-events-auto absolute inset-0">
+              <LogoField constraintsRef={heroRef} />
             </div>
-          </Reveal>
+          </div>
         </div>
       </div>
     </section>
