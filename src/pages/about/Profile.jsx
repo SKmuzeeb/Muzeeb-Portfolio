@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import Reveal, { RevealCard } from '../../components/ui/Reveal.jsx'
 import TechBadge from '../../components/ui/TechIcon.jsx'
-import StackLayers from '../../components/StackLayers.jsx'
+import StackField from '../../components/StackField.jsx'
 import { profile, resume, availability } from '../../data/site.js'
 import { bio, journey, proficiency, exploring } from '../../data/about.js'
 import { TECH } from '../../data/categories.js'
@@ -59,12 +59,12 @@ export function AboutHero() {
         </div>
 
         <RevealCard delay={0.1}>
-          <div className="panel isolate overflow-hidden p-7 sm:p-9">
+          <div className="panel isolate overflow-hidden p-6 sm:p-8">
             <div className="bleed-decor" aria-hidden="true">
               <div className="grid-field absolute inset-0 opacity-20" />
             </div>
             <div className="relative">
-              <StackLayers />
+              <StackField />
             </div>
           </div>
         </RevealCard>

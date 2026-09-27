@@ -184,6 +184,23 @@
   100% { transform: translateY(54px); opacity: 0; }
 }
 
+/* Layer float. Two phase variants so neighbouring layers never bob in
+   lockstep — one shared keyframe would make the field breathe as a single
+   rigid object and kill the sense of separate pieces hanging in space.
+   Transform-only, so the whole field runs on the compositor. */
+@keyframes float-a {
+  0%, 100% { transform: translate3d(0, -7px, 0) rotate(-1.1deg); }
+  50%      { transform: translate3d(0, 9px, 0) rotate(1.1deg); }
+}
+@keyframes float-b {
+  0%, 100% { transform: translate3d(0, 9px, 0) rotate(1.3deg); }
+  50%      { transform: translate3d(0, -8px, 0) rotate(-1.3deg); }
+}
+/* Marching dash along the request path. */
+@keyframes spine-flow {
+  to { stroke-dashoffset: -160; }
+}
+
 @layer base {
   :root {
     color-scheme: dark;
@@ -458,6 +475,12 @@
   .hide-scrollbar::-webkit-scrollbar { display: none; }
 
   /* ── Surfaces ─────────────────────────────────────────── */
+  .pk { animation: pk 2.1s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+  .pk-halo { animation: pk-halo 2.1s ease-in-out infinite; }
+  .float-a { animation: float-a var(--dur, 7s) ease-in-out infinite; }
+  .float-b { animation: float-b var(--dur, 8.4s) ease-in-out infinite; }
+  .spine-flow { stroke-dasharray: 4 12; animation: spine-flow 2.4s linear infinite; }
+
   .panel {
     position: relative;
     border: 1px solid var(--color-line);
