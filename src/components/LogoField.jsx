@@ -49,12 +49,18 @@ const SETS = {
 }
 
 /**
- * Even grid with organic jitter.
+ * A perfect grid. No jitter.
  *
- * The previous version scattered marks on a golden-angle spiral, which packs
- * points towards the middle and leaves the corners empty. A grid guarantees
- * real distance between every mark, and the jitter keeps it organic.
- * Seeded, so the field is identical on every load.
+ * Two earlier passes scattered the marks — a golden-angle spiral first, then
+ * a grid with a seeded offset per mark. Both were "organic", and both were
+ * wrong here: the brief is a clean set of rows and columns, so every mark now
+ * sits exactly on its cell centre. The columns line up and the rows line up,
+ * which is what makes the fall read as a grid filling in rather than as
+ * confetti settling.
+ *
+ * Still seeded, and still random in the ways that matter: how far each mark
+ * falls, how long its drop takes, and its depth. The motion stays organic even
+ * though the layout does not.
  */
 const build = (keys, cols) => {
   const rng = createRng(`about-logo-field:${cols}`)
@@ -65,10 +71,10 @@ const build = (keys, cols) => {
     const row = Math.floor(i / cols)
     return {
       key,
-      x: (col + 0.5) * cw + (rng() - 0.5) * cw * 0.34,
-      y: (row + 0.5) * ch + (rng() - 0.5) * ch * 0.3,
+      // Exact cell centres — this is what makes the rows and columns straight.
+      x: (col + 0.5) * cw,
+      y: (row + 0.5) * ch,
       z: -230 + rng() * 460,
-      alt: i % 2 === 0,
       // Where it falls in from, how long the drop takes, and how long after
       // the one before it. The delay is index-driven and the index walks the
       // grid in reading order, so the field fills in left to right, row by row.
@@ -79,8 +85,15 @@ const build = (keys, cols) => {
   })
 }
 
-/** Nearer marks are larger; far ones recede. */
-const scaleFor = (z) => 0.7 + ((z + 230) / 460) * 0.5
+/**
+ * Nearer marks are slightly larger; far ones recede a little.
+ *
+ * The range is deliberately tight — 0.9x to 1.1x. An earlier pass used 0.7x
+ * to 1.2x, which read as depth but broke the grid: at that spread the marks
+ * looked like different sizes scattered around rather than one set laid out
+ * in rows.
+ */
+const scaleFor = (z) => 0.9 + ((z + 230) / 460) * 0.2
 
 export default function LogoField({ constraintsRef }) {
   const reduced = useReducedMotion()
@@ -191,7 +204,7 @@ function Mark({ mark, bounds, draggable, reduced, grabbed, onGrab, onRelease }) 
         >
           {/* 3 — no idle float. The marks land and stay where they land. */}
           <div className="-translate-x-1/2 -translate-y-1/2">
-            <TechBadge name={mark.key} size="md" showLabel={false} />
+            <TechBadge name={mark.key} size="lg" showLabel={false} />
             <span className="sr-only">{TECH[mark.key].label}</span>
           </div>
         </motion.div>

@@ -71,8 +71,8 @@ export function AboutHero() {
               gets the field rather than an empty hero.
 
               Height is set by the row count: 26 marks at 4 wide is 7 rows, so
-              the band needs ~64px a row to breathe rather than collide. */}
-          <div className="pointer-events-none relative h-[26rem] sm:h-[28rem] lg:h-[30rem]">
+              the band needs ~72px a row for a 48px mark to breathe. */}
+          <div className="pointer-events-none relative h-[30rem] sm:h-[31rem] lg:h-[32rem]">
             <div className="pointer-events-auto absolute inset-0">
               <LogoField constraintsRef={heroRef} />
             </div>
