@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import DiagramImage from './ui/DiagramImage.jsx'
+import TechBadge from './ui/TechIcon.jsx'
 import { TECH } from '../data/categories.js'
 import { useParallax } from '../hooks/index.js'
 
@@ -77,9 +78,15 @@ export default function ArchitectureFlow({ nodes }) {
         </span>
       </div>
 
-      {/* The flow itself. */}
+      {/* The flow itself.
+
+          Hidden on phones on purpose. The diagram is authored at 1400px wide
+          with 15px labels, so in a ~340px viewport those labels land at about
+          3.6px — technically an image, functionally unreadable. The text index
+          below carries the same information at a size a phone can actually
+          read, so the phone gets that instead of a picture of text. */}
       <motion.div
-        className="panel overflow-hidden p-2"
+        className="panel hidden overflow-hidden p-2 md:block"
         initial={reduced ? false : { opacity: 0, y: 26 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.2 }}
@@ -94,8 +101,9 @@ export default function ArchitectureFlow({ nodes }) {
         />
       </motion.div>
 
-      {/* Text index — rules and type, no boxes. Names the hop in flight so the
-          image is never the only thing carrying the meaning. */}
+      {/* Text index. This is what a phone shows instead of the diagram, so it is
+          a genuine vertical flow on small screens — spine and node dots — and
+          turns into the horizontal rules-and-type row once there is room. */}
       <motion.ol
         className="mt-7 grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-5"
         style={reduced ? undefined : { x: drift.x }}
@@ -106,21 +114,30 @@ export default function ArchitectureFlow({ nodes }) {
           return (
             <li
               key={node.id}
-              className="border-t pt-3"
+              className="relative border-line pl-6 sm:pl-0 lg:border-t lg:pt-3"
               style={{
                 borderColor: isActive ? tech.color : 'var(--color-line)',
                 transition: 'border-color 600ms var(--ease-out-expo)',
               }}
             >
+              {/* Node dot, small screens only. */}
               <span
-                className="font-mono text-label tabular-nums tracking-[0.16em]"
-                style={{
-                  color: isActive ? tech.color : 'var(--color-ink-faint)',
-                  transition: 'color 600ms var(--ease-out-expo)',
-                }}
-              >
-                {String(i + 1).padStart(2, '0')}
-              </span>
+                className="absolute top-1.5 -left-[3px] h-1.5 w-1.5 rounded-full sm:hidden"
+                style={{ background: tech.color }}
+                aria-hidden="true"
+              />
+              <div className="flex items-center gap-3 sm:block">
+                <TechBadge name={node.tech} size="sm" showLabel={false} />
+                <span
+                  className="font-mono text-label tabular-nums tracking-[0.16em]"
+                  style={{
+                    color: isActive ? tech.color : 'var(--color-ink-faint)',
+                    transition: 'color 600ms var(--ease-out-expo)',
+                  }}
+                >
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+              </div>
               <p
                 className="mt-1.5 font-display text-sm font-semibold tracking-tight"
                 style={{

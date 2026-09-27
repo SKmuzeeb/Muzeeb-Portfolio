@@ -1,110 +1,170 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, useTransform, useReducedMotion } from 'framer-motion'
 import TechBadge from './ui/TechIcon.jsx'
 import { TECH_GROUPS, TECH } from '../data/categories.js'
 import { createRng } from '../lib/prng.js'
 import { pointerX, pointerY } from '../lib/pointer.js'
+import { useMediaQuery, useIsTouch } from '../hooks/index.js'
 
 /**
- * The whole toolset, floating in depth.
+ * The whole toolset, floating across the hero.
  *
- * This is the entire About hero panel. There is deliberately nothing else in
- * it — no spine, no packet, no layer labels, no status header. The Tech Stack
- * page already explains what each technology is and what layer it sits in;
- * repeating that here meant the hero was a smaller, worse version of a page
- * that already exists.
+ * This used to sit inside a bordered card beside the hero copy, which meant
+ * the marks were clipped, crowded and obviously "a box of logos". It is now a
+ * full-bleed layer of the hero itself, so the tools float in the same space as
+ * the text that describes them.
  *
- * So this is just the real brand marks, hanging in 3D space:
+ * The marks are draggable: grab one and it follows the pointer, let go and it
+ * carries on with the throw and decelerates to a stop, like a ball on a table.
+ * Each mark is bounded by the hero, so it can never be thrown off screen, and
+ * only the mark you grabbed moves.
  *
- *  - Every mark sits at its own translateZ inside a perspective, and the field
- *    rotates with the pointer. That produces real parallax for free: near
- *    marks sweep further across the screen than far ones, because that is what
- *    perspective does. No per-mark fudge maths.
- *  - Position is seeded, so the field is byte-identical on every load. A
- *    constellation that reshuffles on refresh reads as a glitch, not a design.
- *  - Marks float on two alternating keyframes at staggered durations, so the
- *    field never bobs as one rigid object.
- *  - Depth also drives scale and opacity, so the far marks recede instead of
- *    just being smaller.
+ * Structure is three nested elements on purpose, because each animation system
+ * wants its own transform and they would otherwise overwrite each other:
  *
- * Under reduced motion the float, the rotation and the depth all stop, leaving
- * a clean static constellation.
+ *   outer  — pointer parallax, scaled per mark by its depth
+ *   middle — Framer drag + release momentum
+ *   inner  — the idle float, as a CSS animation
+ *
+ * Mobile shows a smaller subset on a wider grid: 26 marks in a phone-width
+ * hero reads as noise, and a denser grid means touching one steals the page
+ * scroll from the reader.
  */
 
-/** Every technology on the site, de-duplicated, in a stable order. */
 const ALL = [...new Set(TECH_GROUPS.flatMap((g) => g.items))]
 
-const FIELD = (() => {
-  const rng = createRng('about-logo-field')
-  const n = ALL.length
-  return ALL.map((key, i) => {
-    // Golden-angle scatter spreads points evenly with no clumping, which
-    // looks far more deliberate than pure random across a small panel.
-    const a = i * 2.399963
-    const r = 9 + (i / n) * 30 + (rng() - 0.5) * 6
+/** Marks shown per breakpoint. Fewer on a phone, and drag is touch-disabled. */
+const SETS = {
+  desktop: { keys: ALL, cols: 6 },
+  mobile: { keys: ALL.filter((_, i) => i % 2 === 0).slice(0, 12), cols: 3 },
+}
+
+/**
+ * Even grid with organic jitter.
+ *
+ * The previous version scattered marks on a golden-angle spiral, which packed
+ * them towards the middle and left the corners empty — the clumping the brief
+ * called out. A grid guarantees real distance between every mark, and the
+ * jitter keeps it from looking like a spreadsheet.
+ *
+ * Seeded, so the constellation is identical on every load. A field that
+ * reshuffles on refresh reads as a glitch rather than a design.
+ */
+const build = (keys, cols) => {
+  const rng = createRng(`about-logo-field:${cols}`)
+  const cw = 100 / cols
+  const ch = 100 / Math.ceil(keys.length / cols)
+  return keys.map((key, i) => {
+    const col = i % cols
+    const row = Math.floor(i / cols)
     return {
       key,
-      // Percentages of the panel, so the field scales with it.
-      x: 50 + Math.cos(a) * r,
-      y: 50 + Math.sin(a) * r * 0.88,
+      x: (col + 0.5) * cw + (rng() - 0.5) * cw * 0.4,
+      y: (row + 0.5) * ch + (rng() - 0.5) * ch * 0.36,
       z: -230 + rng() * 460,
       dur: 5.4 + rng() * 4.6,
       delay: -rng() * 7,
       alt: i % 2 === 0,
+      parallax: 6 + rng() * 26,
     }
   })
-})()
+}
 
 /** Nearer marks are larger and more opaque; far ones recede. */
-const scaleFor = (z) => 0.62 + ((z + 230) / 460) * 0.55
-const fadeFor = (z) => 0.3 + ((z + 230) / 460) * 0.7
+const scaleFor = (z) => 0.7 + ((z + 230) / 460) * 0.5
+const fadeFor = (z) => 0.35 + ((z + 230) / 460) * 0.65
 
-export default function LogoField() {
+
+export default function LogoField({ constraintsRef }) {
   const reduced = useReducedMotion()
+  const isTouch = useIsTouch()
+  const wide = useMediaQuery('(min-width: 768px)')
+  const selfRef = useRef(null)
+  const [grabbed, setGrabbed] = useState(null)
 
-  const rotY = useTransform(pointerX, [-1, 1], [11, -11])
-  const rotX = useTransform(pointerY, [-1, 1], [-8, 8])
+  // Drag is pointer-only. On touch the marks sit over the copy, and a
+  // draggable target there would swallow the page scroll.
+  const draggable = !isTouch && !reduced
 
-  const marks = useMemo(() => FIELD.filter((f) => TECH[f.key]), [])
+  // While a mark is held the ambient parallax would fight the hand, so the
+  // field goes still until it is released.
+  useEffect(() => {
+    if (grabbed) pointerX.set(0)
+  }, [grabbed])
+
+  const marks = useMemo(() => {
+    const set = wide ? SETS.desktop : SETS.mobile
+    return build(set.keys, set.cols)
+  }, [wide])
+
+  const bounds = constraintsRef || selfRef
 
   return (
-    <div className="relative h-[24rem] w-full [perspective:1100px] sm:h-[27rem]">
+    <div ref={selfRef} className="absolute inset-0 overflow-hidden">
+      {marks.map((mark) => (
+        <Mark
+          key={mark.key}
+          mark={mark}
+          bounds={bounds}
+          draggable={draggable}
+          reduced={reduced}
+          grabbed={grabbed}
+          onGrab={() => setGrabbed(mark.key)}
+          onRelease={() => setGrabbed(null)}
+        />
+      ))}
+    </div>
+  )
+}
+
+function Mark({ mark, bounds, draggable, reduced, grabbed, onGrab, onRelease }) {
+  const held = grabbed === mark.key
+  // Parallax is suppressed while any mark is held, so the grabbed one tracks
+  // the hand exactly instead of sliding out from under it.
+  const still = reduced || grabbed
+  const px = useTransform(pointerX, [-1, 1], [-mark.parallax, mark.parallax])
+  const py = useTransform(pointerY, [-1, 1], [-mark.parallax, mark.parallax])
+
+  return (
+    <div className="absolute" style={{ left: `${mark.x}%`, top: `${mark.y}%` }}>
+      {/* Depth parallax. */}
       <motion.div
-        className="absolute inset-0"
-        style={reduced ? undefined : { rotateX: rotX, rotateY: rotY, transformStyle: 'preserve-3d' }}
+        className="absolute"
+        style={still ? undefined : { x: px, y: py, opacity: fadeFor(mark.z) }}
       >
-        {marks.map((mark) => (
+        {/* Drag + release momentum.
+
+            `touch-none` is only applied when dragging is actually enabled.
+            Left on unconditionally it silently kills page scrolling anywhere
+            a mark happens to sit — the worst kind of mobile bug, because it
+            just looks like the page is broken. */}
+        <motion.div
+          className={`absolute ${draggable ? 'cursor-grab touch-none' : ''}`}
+          style={{ scale: held ? scaleFor(mark.z) * 1.35 : scaleFor(mark.z) }}
+          drag={draggable}
+          dragConstraints={bounds}
+          // A little give at the edges, so a hard throw thuds against the
+          // hero rather than stopping dead against an invisible wall.
+          dragElastic={0.12}
+          dragMomentum
+          dragTransition={{ type: 'inertia', power: 0.32, timeConstant: 900 }}
+          onDragStart={onGrab}
+          onDragEnd={onRelease}
+          onPointerDown={onGrab}
+          whileDrag={draggable ? { zIndex: 40 } : undefined}
+        >
+          {/* Idle float. */}
           <div
-            key={mark.key}
-            className="absolute"
-            style={{ left: `${mark.x}%`, top: `${mark.y}%` }}
+            className={`-translate-x-1/2 -translate-y-1/2 ${reduced ? '' : mark.alt ? 'float-b' : 'float-a'}`}
+            style={{
+              '--dur': `${mark.dur.toFixed(2)}s`,
+              animationDelay: `${mark.delay.toFixed(2)}s`,
+            }}
           >
-            <motion.div
-              className="absolute"
-              style={
-                reduced
-                  ? undefined
-                  : {
-                      z: mark.z,
-                      scale: scaleFor(mark.z),
-                      opacity: fadeFor(mark.z),
-                      transformStyle: 'preserve-3d',
-                    }
-              }
-            >
-              <div
-                className={`-translate-x-1/2 -translate-y-1/2 ${reduced ? '' : mark.alt ? 'float-b' : 'float-a'}`}
-                style={{
-                  '--dur': `${mark.dur.toFixed(2)}s`,
-                  animationDelay: `${mark.delay.toFixed(2)}s`,
-                }}
-              >
-                <TechBadge name={mark.key} size="lg" showLabel={false} />
-                <span className="sr-only">{TECH[mark.key].label}</span>
-              </div>
-            </motion.div>
+            <TechBadge name={mark.key} size="lg" showLabel={false} />
+            <span className="sr-only">{TECH[mark.key].label}</span>
           </div>
-        ))}
+        </motion.div>
       </motion.div>
     </div>
   )

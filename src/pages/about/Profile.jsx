@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useRef } from 'react'
 import Reveal, { RevealCard } from '../../components/ui/Reveal.jsx'
 import TechBadge from '../../components/ui/TechIcon.jsx'
 import LogoField from '../../components/LogoField.jsx'
@@ -16,16 +17,25 @@ import { TECH } from '../../data/categories.js'
  * the real stack with real brand marks.
  */
 export function AboutHero() {
+  const heroRef = useRef(null)
+
   return (
-    <section className="bleed overflow-hidden pt-(--nav-h)">
+    <section ref={heroRef} className="bleed relative overflow-hidden pt-(--nav-h)">
+      {/* Background field. */}
       <div className="bleed-decor" aria-hidden="true">
         <div className="grid-field absolute inset-0 opacity-25 mask-fade-b" />
         <div className="absolute -top-32 left-1/4 h-[30rem] w-[30rem] rounded-full bg-flame/10 blur-[140px]" />
         <div className="absolute right-1/4 bottom-0 h-[26rem] w-[26rem] rounded-full bg-plasma/10 blur-[140px]" />
       </div>
 
-      <div className="shell relative grid items-center gap-14 py-(--spacing-margin) lg:grid-cols-[1.05fr_0.95fr]">
-        <div>
+      {/* The marks float across the whole hero rather than sitting in a card
+          beside the copy, and the hero is what bounds a thrown one. */}
+      <div className="absolute inset-0 z-0">
+        <LogoField constraintsRef={heroRef} />
+      </div>
+
+      <div className="shell relative z-10 py-(--spacing-margin)">
+        <div className="max-w-3xl">
           <Reveal>
             <p className="eyebrow">
               <span className="inline-block h-1.5 w-1.5 animate-pulse-ring rounded-full bg-lime" />
@@ -57,17 +67,6 @@ export function AboutHero() {
             </div>
           </Reveal>
         </div>
-
-        <RevealCard delay={0.1}>
-          <div className="panel isolate overflow-hidden p-6 sm:p-8">
-            <div className="bleed-decor" aria-hidden="true">
-              <div className="grid-field absolute inset-0 opacity-20" />
-            </div>
-            <div className="relative">
-              <LogoField />
-            </div>
-          </div>
-        </RevealCard>
       </div>
     </section>
   )

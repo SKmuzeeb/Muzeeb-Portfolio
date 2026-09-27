@@ -84,12 +84,15 @@
 
   /* ── Layout ─────────────────────────────────────────────── */
   /* Section rhythm. --spacing-margin drives every section's vertical padding,
-     so it must exist as a real token rather than a dangling var() reference. */
+     so it must exist as a real token rather than a dangling var() reference.
+     The lower bound is deliberately smaller than the desktop value: 72px of
+     padding top and bottom on a phone is a full screen of scrolling between
+     two sections. */
   --spacing-gutter: 1.75rem;
-  --spacing-edge: clamp(1.25rem, 5vw, 5.5rem);
-  --spacing-margin: clamp(4.5rem, 9vw, 9.5rem);
-  --spacing-stack: clamp(2.5rem, 5vw, 5rem);
-  --spacing-card: clamp(1.25rem, 2vw, 1.75rem);
+  --spacing-edge: clamp(1.1rem, 5vw, 5.5rem);
+  --spacing-margin: clamp(3.5rem, 9vw, 9.5rem);
+  --spacing-stack: clamp(2.25rem, 5vw, 5rem);
+  --spacing-card: clamp(1.1rem, 2.4vw, 1.75rem);
   --radius-xs: 0.25rem;
   --radius-sm: 0.375rem;
   --radius-DEFAULT: 0.625rem;
@@ -255,6 +258,25 @@
   img, svg, video, canvas {
     display: block;
     max-width: 100%;
+  }
+
+  /* Mobile safety net. Long URLs, monospace fragments and stack keys would
+     otherwise push a grid or flex child wider than a phone viewport, which
+     shows up as a page that scrolls sideways and never recovers. */
+  html {
+    overflow-x: hidden;
+  }
+
+  p, li, dd, dt, h1, h2, h3, h4, h5, h6, span, a, button {
+    overflow-wrap: anywhere;
+  }
+
+  /* Flex and grid children default to min-width:auto, so a wide child can
+     still stretch its track. This is the single most common cause of
+     horizontal overflow on a phone. */
+  .shell > *,
+  .min-w-0 {
+    min-width: 0;
   }
 
   ::selection {
