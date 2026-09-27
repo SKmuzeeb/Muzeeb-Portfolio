@@ -149,8 +149,11 @@ export default function ProjectBody({ project, diagrams }) {
         </div>
       </Section>
 
+      {/* Sections 01 and 02 live in ProjectBody. The decisions section is its
+          own component and carries 03, so the three that follow it here are
+          numbered from 04. */}
       <Section
-        index="03"
+        index="04"
         kicker="Implementation"
         title="From design to"
         accent="working code."
@@ -164,7 +167,7 @@ export default function ProjectBody({ project, diagrams }) {
       </Section>
 
       <Section
-        index="04"
+        index="05"
         kicker="Application modules"
         title="What the application"
         accent="is made of."
@@ -174,7 +177,7 @@ export default function ProjectBody({ project, diagrams }) {
       </Section>
 
       <Section
-        index="05"
+        index="06"
         kicker="Development process"
         title="How the work was"
         accent="approached."

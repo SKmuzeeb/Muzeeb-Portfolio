@@ -3,6 +3,7 @@ import { lazy, Suspense, useRef } from 'react'
 import HeroContent from './HeroContent.jsx'
 import { useParallax } from '../../hooks/index.js'
 import { pointerX, pointerY } from '../../lib/pointer.js'
+import SceneBoundary from '../../components/SceneBoundary.jsx'
 
 // three.js is ~190 kB gzipped. Only the home page needs it, so it is loaded
 // on demand rather than sitting in the initial bundle for every route.
@@ -56,14 +57,16 @@ export default function Hero() {
       className="bleed flex min-h-svh items-center overflow-hidden pt-(--nav-h)"
       aria-labelledby="hero-title"
     >
-      {/* ── Layer 0 · WebGL service mesh ─────────────────── */}
+      {/* ── Layer 0 · WebGL lattice ───────────────────────── */}
       <motion.div
         className="absolute inset-0"
         style={{ scale: canvasScale, opacity: canvasOpacity, zIndex: -30 }}
       >
-        <Suspense fallback={null}>
-          <HeroScene className="h-full w-full" />
-        </Suspense>
+        <SceneBoundary className="size-full" label="lattice">
+          <Suspense fallback={null}>
+            <HeroScene className="h-full w-full" />
+          </Suspense>
+        </SceneBoundary>
       </motion.div>
 
       {/* ── Layer 1 · grid field + accent glows ──────────── */}

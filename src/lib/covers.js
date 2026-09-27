@@ -7,8 +7,8 @@
  *
  * Each cover is now one of three kinds:
  *   'logos' — real vendor marks wired together with a flow, for a system whose
- *             identity IS its integrations (Migratron moves data between
- *             Google, a tenant and Microsoft 365).
+ *             identity IS its integrations (Migratron moves data from Google
+ *             Workspace across to Microsoft 365).
  *   'word'   — a white uppercase wordmark, for a product with a name.
  *   'glyph'  — a domain mark that belongs to nobody's trademark, for a system
  *             defined by what it does rather than who it talks to.
@@ -28,17 +28,22 @@ import { TECH } from '../data/categories.js'
 /** Cover definitions, keyed by project slug. */
 const COVERS = {
   /**
-   * Migratron moves users, mail, files and permissions between tenants and
-   * between Google and a tenant. Those are real integrations, so the cover
-   * shows the real Google and Microsoft marks either side of a tenant, with
-   * packets travelling both ways.
+   * Migratron moves users, mail, files and permissions from Google Workspace
+   * across to Microsoft 365. Both ends are real integrations, so the cover shows
+   * the real Google and Microsoft marks and connects them directly.
+   *
+   * There used to be a third "Tenant" card sitting between them, on the
+   * reasoning that the migration passes through a tenant. It did not earn its
+   * place: the tenant is where the data *comes from* and *goes to*, not a third
+   * system in the path, and a neutral card with no logo in the middle of two
+   * real vendor marks read as a missing diagram. Two endpoints and a transfer
+   * is the accurate picture.
    */
   migratron: {
     kind: 'logos',
-    caption: 'GOOGLE · TENANT · MICROSOFT',
+    caption: 'GOOGLE WORKSPACE → MICROSOFT 365',
     nodes: [
-      { logo: 'google', label: 'Google' },
-      { tenant: 'Tenant' },
+      { logo: 'google', label: 'Google Workspace' },
       { logo: 'microsoft', label: 'Microsoft 365' },
     ],
   },
@@ -87,14 +92,21 @@ function vendorMark(key, x, y, size) {
 }
 
 /* ── Kind: logos ─────────────────────────────────────────────
-   Vendor marks either side of the domain's own concept, with packets
-   travelling both ways so the migration reads as a flow, not logo soup. */
+   Real vendor marks, connected by lanes that carry packets both ways so a
+   transfer reads as a transfer rather than as two logos sitting near each
+   other. */
 function logosBody(spec, { W, H, accent, accent2 }) {
   const cy = H / 2 - H * 0.02
   const mark = Math.min(W, H) * 0.13
-  const tile = Math.min(W, H) * 0.2
   const nodes = spec.nodes
-  const gap = (W * 0.78) / (nodes.length - 1)
+  // The span between the first and last node is a function of how many nodes
+  // there are, not a fixed fraction of the canvas. A fixed span was tuned for
+  // three nodes; with two it pushed the marks almost to the edges and left a
+  // void down the middle, which is a worse composition than the three-node
+  // version it replaced. Tighter also reads faster — the packet lanes have
+  // less distance to cross.
+  const span = nodes.length <= 2 ? 0.36 : Math.min(0.78, 0.12 + 0.22 * (nodes.length - 1))
+  const gap = (W * span) / (nodes.length - 1)
   const x0 = W / 2 - (gap * (nodes.length - 1)) / 2
 
   const out = []
@@ -121,15 +133,10 @@ function logosBody(spec, { W, H, accent, accent2 }) {
       })
     }
 
-    if (node.tenant) {
-      // A tenant is our own concept, so it gets a neutral card, not a logo.
-      const x = cx - tile / 2
-      const y = cy - tile / 2
-      out.push(
-        `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${tile.toFixed(1)}" height="${tile.toFixed(1)}" rx="18" fill="${accent}" fill-opacity=".07" stroke="${accent}" stroke-opacity=".55" stroke-width="2"/>`,
-        `<text x="${cx.toFixed(1)}" y="${(cy + 7).toFixed(1)}" font-family="monospace" font-size="26" letter-spacing="2" text-anchor="middle" fill="#f5f7fb">${esc(node.tenant.toUpperCase())}</text>`,
-      )
-    } else if (node.logo) {
+    // Every node on a `logos` cover is a real vendor mark. A cover may still
+    // carry a `label` that differs from the vendor's own name — "Google
+    // Workspace" rather than "Google" — and the label is drawn underneath.
+    if (node.logo) {
       out.push(vendorMark(node.logo, cx - mark / 2, cy - mark / 2, mark))
     }
 

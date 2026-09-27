@@ -1,4 +1,5 @@
 import { RevealCard } from '../components/ui/Reveal.jsx'
+import HeroObject from '../components/HeroObject.jsx'
 import SectionHeading from '../components/SectionHeading.jsx'
 import Study from './cases/Study.jsx'
 import Cta from './home/Cta.jsx'
@@ -34,6 +35,7 @@ export default function CaseStudies() {
         </div>
 
         <div className="shell py-(--spacing-margin)">
+          <HeroObject variant="carousel" />
           <SectionHeading
             kicker={`${projects.length} deep dives`}
             title="Case studies —"

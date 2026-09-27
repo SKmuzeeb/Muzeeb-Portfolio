@@ -1,4 +1,5 @@
 import Reveal from '../components/ui/Reveal.jsx'
+import HeroObject from '../components/HeroObject.jsx'
 import DiagramImage from '../components/ui/DiagramImage.jsx'
 import ArchitectureFlow from '../components/ArchitectureFlow.jsx'
 import SectionHeading from '../components/SectionHeading.jsx'
@@ -17,6 +18,7 @@ export default function TechStack() {
         </div>
 
         <div className="shell py-(--spacing-margin)">
+          <HeroObject variant="gyro" />
           <SectionHeading
             kicker="Technology stack"
             title="The tools I build"

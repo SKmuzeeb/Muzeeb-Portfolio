@@ -1,4 +1,5 @@
 import Reveal, { RevealCard } from '../components/ui/Reveal.jsx'
+import HeroObject from '../components/HeroObject.jsx'
 import SectionHeading from '../components/SectionHeading.jsx'
 import TechIcon from '../components/ui/TechIcon.jsx'
 import { TECH } from '../data/categories.js'
@@ -69,6 +70,9 @@ export default function Experience() {
           <div className="grid-field absolute inset-0 opacity-30" />
           <div className="absolute -top-32 right-1/3 h-[30rem] w-[30rem] rounded-full bg-plasma/10 blur-[140px]" />
         </div>
+
+        {/* 3D strata, to the right of the heading. */}
+        <HeroObject variant="strata" />
 
         <div className="shell py-(--spacing-margin)">
           <SectionHeading

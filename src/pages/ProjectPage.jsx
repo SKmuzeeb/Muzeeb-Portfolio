@@ -4,6 +4,7 @@ import ProjectHero from './project/ProjectHero.jsx'
 import ProjectMeta from './project/ProjectMeta.jsx'
 import ProjectOverview from './project/ProjectOverview.jsx'
 import ProjectBody from './project/ProjectBody.jsx'
+import ProjectDecisions from '../components/ProjectDecisions.jsx'
 import NextUp from './project/NextUp.jsx'
 import SystemWalkthrough from '../components/SystemWalkthrough.jsx'
 import SectionHeading from '../components/SectionHeading.jsx'
@@ -37,19 +38,20 @@ export default function ProjectPage() {
       </div>
 
       <ProjectOverview project={project} />
+      <ProjectDecisions project={project} />
       <ProjectBody project={project} diagrams={diagrams} />
 
       <section className="py-(--spacing-margin)">
         <div className="shell">
           <SectionHeading
             index="06"
-            kicker="System walkthrough"
+            kicker="Request path"
             title="Follow a request"
             accent="through the system."
-            lede="Step through the layers a request passes through, as they are actually arranged in this system."
+            lede="The layers a request passes through, in the order they are actually arranged in this system."
           />
-          <div className="mt-12">
-            <SystemWalkthrough project={project} diagrams={diagrams} layers={diagrams.architecture.layers} />
+          <div className="mt-14">
+            <SystemWalkthrough project={project} layers={diagrams.architecture.layers} />
           </div>
 
           {project.hasBreakdown && (

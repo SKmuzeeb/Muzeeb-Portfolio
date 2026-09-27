@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import SectionHeading from '../components/SectionHeading.jsx'
+import HeroObject from '../components/HeroObject.jsx'
 import ProjectCard from '../components/ProjectCard.jsx'
 import CategoryFilter from '../components/CategoryFilter.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
@@ -34,6 +35,7 @@ export default function Projects() {
         </div>
 
         <div className="shell py-(--spacing-margin)">
+          <HeroObject variant="bars" />
           <SectionHeading
             kicker={`${projects.length} systems · ${categories.length - 1} disciplines`}
             title="Selected work — systems I"

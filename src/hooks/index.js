@@ -38,6 +38,34 @@ export function useParallax({ depth = 1, max = 40, spring = true, feel = 'soft' 
 }
 
 /**
+ * Pointer-driven 3D tilt.
+ *
+ * Same shared pointer store as useParallax, but rotation instead of
+ * translation. For an object that genuinely sits in 3D, rotation carries far
+ * more depth than a slide does — moving an object sideways reads as a
+ * carousel, tilting it reads as a camera.
+ *
+ * Returns frozen zeros under reduced motion rather than a raw unsprung value,
+ * so opting out of motion really does opt out.
+ */
+export function useTilt({ depth = 1, max = 14, feel = 'soft' } = {}) {
+  const reduced = useReducedMotion()
+  const config = feel === 'tight' ? TIGHT : SOFT
+
+  // Vertical pointer drives rotateX, horizontal drives rotateY. The signs are
+  // chosen so the surface tips *away* from the cursor, like a real object.
+  const tiltX = useTransform(pointerY, [-1, 1], [max * depth, -max * depth])
+  const tiltY = useTransform(pointerX, [-1, 1], [-max * depth, max * depth])
+  const springX = useSpring(tiltX, config)
+  const springY = useSpring(tiltY, config)
+
+  const zeroX = useTransform(() => 0)
+  const zeroY = useTransform(() => 0)
+  if (reduced) return { rotateX: zeroX, rotateY: zeroY }
+  return { rotateX: springX, rotateY: springY }
+}
+
+/**
  * Drag-reactive tilt for a card or panel.
  *
  * Returns 0 at rest and grows while the pointer is actually moving, so the

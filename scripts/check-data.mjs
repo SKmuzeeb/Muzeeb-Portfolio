@@ -43,6 +43,48 @@ for (const p of projects) {
   check(!!p.purpose, `${tag}: missing purpose`)
   check(!!p.challenge, `${tag}: missing challenge`)
   check(!!p.approach, `${tag}: missing approach`)
+
+  // Decisions are three parts, and all three are required. The cost is the
+  // one that matters: a decision with nothing given up is usually one that was
+  // never examined, so it is checked for content rather than merely presence.
+  check(Array.isArray(p.decisions) && p.decisions.length >= 3, `${tag}: needs >= 3 decisions`)
+  for (const [di, d] of (p.decisions ?? []).entries()) {
+    const where = `${tag} decision ${di + 1}`
+    check(!!d.title, `${where}: missing title`)
+    check(!!d.choice, `${where}: missing choice`)
+    check(!!d.because, `${where}: missing because`)
+    check(!!d.cost, `${where}: missing cost`)
+    if (d.title && d.choice && d.because && d.cost) {
+      const shortest = [d.choice, d.because, d.cost].reduce((a, b) => (a.length <= b.length ? a : b))
+      check(
+        shortest.length >= 40,
+        `${where}: a field is too thin to be meaningful (${shortest.length} chars, want 40+)`,
+      )
+    }
+    // A cost that is essentially a restatement of the choice is the failure
+    // mode this section exists to avoid. Compared on content words only —
+    // "every", "that" and "through" appear in both halves of almost any
+    // sentence pair and would make this fire on everything.
+    if (d.cost && d.choice) {
+      const STOP = new Set(
+        'every that with from into then than they them this those there which when what where while would could should about their they been being have has had does did not but its it as at by on in of to a an and or is are was were be been do does if so no yes one two also more most much some any each other another same such own very can will just only now new'.split(' '),
+      )
+      const content = (s) =>
+        s
+          .toLowerCase()
+          .replace(/[^a-z ]/g, ' ')
+          .split(/\s+/)
+          .filter((w) => w.length > 4 && !STOP.has(w))
+      const choiceWords = new Set(content(d.choice))
+      const overlap = content(d.cost).filter((w) => choiceWords.has(w)).length
+      check(
+        overlap < 3,
+        `${where}: cost restates the choice rather than describing a trade-off (${overlap} shared content words)`,
+      )
+    }
+  }
+
+  check(Array.isArray(p.boundaries) && p.boundaries.length >= 2, `${tag}: needs >= 2 boundaries`)
   check(Array.isArray(p.areas) && p.areas.length >= 5, `${tag}: needs >= 5 feature areas`)
   check(Array.isArray(p.roles) && p.roles.length > 0, `${tag}: missing roles`)
   check(Array.isArray(p.tech) && p.tech.length > 0, `${tag}: missing tech`)
