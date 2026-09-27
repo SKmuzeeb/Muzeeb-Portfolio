@@ -188,10 +188,29 @@ function Mesh() {
     attr.needsUpdate = true
   })
 
-  const s = Math.min(viewport.width, viewport.height) * 0.17
+  /* Size and position, in world units, so the mesh is the same apparent size on
+     every screen shape.
+
+     R3F's `viewport` is in world units, and the camera sees 4.76 of height at
+     z=0. The mesh is 4.7 across in its own local space, so `narrow * 0.17`
+     made it fill 80% of the narrow edge — on a phone as much as a desktop.
+     That is why it read as one enormous mass sitting behind the name instead
+     of an object in the scene, and why the near side of the sphere was the
+     only part ever visible.
+
+     At 0.12 it fills 56% of the narrow edge on every screen. Sizing off the
+     smaller dimension is what keeps it inside the frame on a narrow phone
+     rather than spilling off both sides. */
+  const s = Math.min(viewport.width, viewport.height) * 0.12
+  // The offset is proportional for the same reason: a fixed world-space shift
+  // would be a nudge on a desktop and most of the way off a phone.
+  const shiftX = viewport.width * 0.17
+  const shiftY = viewport.height * -0.02
 
   return (
-    <group ref={group} scale={s}>
+    /* The visible mesh and the inner shell live in this one group, so they
+       scale and shift together and cannot drift apart. */
+    <group ref={group} scale={s} position={[shiftX, shiftY, 0]}>
       <points geometry={node}>
         <shaderMaterial
           ref={nodeMat}
@@ -316,10 +335,14 @@ export default function HeroScene({ className = '' }) {
   return (
     <div ref={hostRef} className={className} aria-hidden="true">
       <Canvas
-        dpr={[1, 1.75]}
+        dpr={[1, 1.5]}
         frameloop={visible && !reduced ? 'always' : 'never'}
         camera={{ position: [0, 0, 6.2], fov: 42, near: 0.1, far: 100 }}
-        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+        /* Multisampling off. The scene is thin additive lines, and at a dpr of
+           1.5 or more those are already well sampled — MSAA was costing a
+           resolve on every frame of a full-screen additive pass and buying
+           almost nothing. The glow, not the geometry, is what the eye reads. */
+        gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}
       >
         <Mesh />
         <Rig />
