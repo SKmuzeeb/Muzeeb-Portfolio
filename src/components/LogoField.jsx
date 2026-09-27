@@ -33,9 +33,19 @@ import { useMediaQuery, useIsTouch } from '../hooks/index.js'
 const ALL = [...new Set(TECH_GROUPS.flatMap((g) => g.items))]
 
 /** Marks per breakpoint. Fewer on a phone, where the region is much smaller. */
+/**
+ * Four to a row, and every mark used.
+ *
+ * The brief is a line that fills in one by one, so the grid is a strict 4 wide
+ * at every breakpoint and nothing is dropped to make the numbers work. 26 marks
+ * come, so 26 land: six full rows of four and a final row of two.
+ *
+ * Falling order is row-major — left to right, then down — because the delay is
+ * driven by the mark's index and the index walks the grid in reading order.
+ */
 const SETS = {
   desktop: { keys: ALL, cols: 4 },
-  mobile: { keys: ALL.filter((_, i) => i % 3 === 0).slice(0, 9), cols: 3 },
+  mobile: { keys: ALL, cols: 4 },
 }
 
 /**
@@ -60,10 +70,11 @@ const build = (keys, cols) => {
       z: -230 + rng() * 460,
       alt: i % 2 === 0,
       // Where it falls in from, how long the drop takes, and how long after
-      // the one before it. All three are per-mark, so no two land together.
+      // the one before it. The delay is index-driven and the index walks the
+      // grid in reading order, so the field fills in left to right, row by row.
       drop: 110 + rng() * 150,
       fallDur: 1.1 + rng() * 0.9,
-      fallDelay: 0.04 + i * 0.09,
+      fallDelay: 0.04 + i * 0.085,
     }
   })
 }
@@ -180,7 +191,7 @@ function Mark({ mark, bounds, draggable, reduced, grabbed, onGrab, onRelease }) 
         >
           {/* 3 — no idle float. The marks land and stay where they land. */}
           <div className="-translate-x-1/2 -translate-y-1/2">
-            <TechBadge name={mark.key} size="lg" showLabel={false} />
+            <TechBadge name={mark.key} size="md" showLabel={false} />
             <span className="sr-only">{TECH[mark.key].label}</span>
           </div>
         </motion.div>

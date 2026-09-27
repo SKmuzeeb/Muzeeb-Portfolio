@@ -66,10 +66,13 @@ export function AboutHero() {
             </Reveal>
           </div>
 
-          {/* Empty space beside the copy. No border, no panel — the marks are
-              the content, so wrapping them in a box would only box them in
-              again. Height reserves the room they fall into. */}
-          <div className="pointer-events-none relative hidden h-[24rem] lg:block">
+          {/* The marks. On lg this is the empty right-hand column; below that
+              it drops under the copy as a full-width band, so a phone still
+              gets the field rather than an empty hero.
+
+              Height is set by the row count: 26 marks at 4 wide is 7 rows, so
+              the band needs ~64px a row to breathe rather than collide. */}
+          <div className="pointer-events-none relative h-[26rem] sm:h-[28rem] lg:h-[30rem]">
             <div className="pointer-events-auto absolute inset-0">
               <LogoField constraintsRef={heroRef} />
             </div>
