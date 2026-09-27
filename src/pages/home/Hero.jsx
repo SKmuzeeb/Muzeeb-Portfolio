@@ -41,10 +41,15 @@ export default function Hero() {
   const canvasOpacity = useTransform(scrollYProgress, [0, 0.9], [1, 0])
 
   /* Cursor spotlight — tracks the pointer 1:1 with no spring, so it feels
-     welded to the cursor rather than chasing it. */
+     welded to the cursor rather than chasing it.
+
+     Built from a CSS variable rather than a literal colour. Additive white
+     light is invisible on cream, so the light theme swaps it for a warm
+     stain; the browser resolves the variable at paint time, so this stays
+     correct when the theme changes without a re-render. */
   const spotX = useTransform(pointerX, (v) => `${(v * 0.5 + 0.5) * 100}%`)
   const spotY = useTransform(pointerY, (v) => `${(v * 0.5 + 0.5) * 100}%`)
-  const spotlight = useMotionTemplate`radial-gradient(46rem circle at ${spotX} ${spotY}, rgb(255 255 255 / 0.09), rgb(255 255 255 / 0.03) 45%, transparent 72%)`
+  const spotlight = useMotionTemplate`radial-gradient(46rem circle at ${spotX} ${spotY}, var(--color-spot) 0%, color-mix(in srgb, var(--color-spot) 45%, transparent) 45%, transparent 72%)`
 
   /* The grid counter-drifts, which sells depth far better than moving the
      whole layer with the cursor. */
@@ -83,17 +88,26 @@ export default function Hero() {
           style={{ x: gridX, y: gridY }}
         />
         <motion.div
+          data-hero-glow=""
           className="absolute top-[4%] left-[2%] h-[46rem] w-[46rem] rounded-full bg-flame/12 blur-[140px]"
           style={{ x: far.x, y: far.y }}
         />
         <motion.div
+          data-hero-glow=""
           className="absolute right-[2%] bottom-[4%] h-[38rem] w-[38rem] rounded-full bg-plasma/14 blur-[150px]"
           style={{ x: mid.x, y: mid.y }}
         />
         <motion.div
+          data-hero-glow=""
           className="absolute top-[38%] left-[46%] h-[22rem] w-[22rem] rounded-full bg-aqua/8 blur-[120px]"
           style={{ x: tight.x, y: tight.y }}
         />
+
+        {/* Paper grain. Empty in the dark theme; a fine cross-hatch in the
+            cream one, because a flat cream field reads as an unstyled page
+            and this is what makes it read as paper. */}
+        <div data-hero-grain="" className="absolute inset-0" />
+
         <div className="absolute inset-x-0 bottom-0 h-64 bg-linear-to-t from-void to-transparent" />
         <div className="vignette" />
       </div>

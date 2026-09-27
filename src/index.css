@@ -57,6 +57,11 @@
      rule has to darken a black hero and merely warm a cream one. */
   --color-shade: rgb(0 0 0 / 0.9);
 
+  /* Blueprint grid line, and the cursor spotlight. Both are additive white on
+     black, so both need a different value in the light theme to stay visible. */
+  --color-grid: rgb(255 255 255 / 0.035);
+  --color-spot: rgb(255 255 255 / 0.1);
+
   /* ── Typography ─────────────────────────────────────────── */
   --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
@@ -165,43 +170,56 @@
  * `var(--color-*)`, every `bg-panel`, `text-ink-mute`, `border-line` and so on
  * in the whole project flips with these, with no component touched.
  *
+ * The ground is a real cream, not a very light grey. An earlier pass used
+ * #f2eee4 which read as plain white on a normal monitor; these are warmer and
+ * a step deeper, so the page looks like paper rather than a blank canvas.
+ *
  * `color-scheme` is what makes the browser's own scrollbars, form controls and
  * the canvas background follow the theme instead of staying dark.
  */
 [data-theme='light'] {
   color-scheme: light;
 
-  --color-void: #f2eee4;
-  --color-void-raised: #e9e4d6;
-  --color-panel: #faf8f1;
-  --color-panel-2: #f0ebdf;
-  --color-panel-3: #e5dfd0;
-  --color-panel-4: #d8d1bf;
+  --color-void: #ece4d3;
+  --color-void-raised: #e0d6c0;
+  --color-panel: #f6f1e4;
+  --color-panel-2: #ece4d3;
+  --color-panel-3: #ded3ba;
+  --color-panel-4: #cbbfa2;
 
-  --color-ink: #0b0b0b;
-  --color-ink-dim: #2f2c26;
-  --color-ink-mute: #5c574d;
-  --color-ink-faint: #8d8779;
+  --color-ink: #100d08;
+  --color-ink-dim: #2f2a20;
+  --color-ink-mute: #5a5243;
+  --color-ink-faint: #8b8069;
 
-  --color-flame: #0b0b0b;
-  --color-flame-soft: #2f2c26;
-  --color-plasma: #3a372f;
-  --color-aqua: #4a463c;
-  --color-lime: #565045;
-  --color-magenta: #443f37;
+  --color-flame: #100d08;
+  --color-flame-soft: #2f2a20;
+  --color-plasma: #3a3428;
+  --color-aqua: #4a4335;
+  --color-lime: #564e3d;
+  --color-magenta: #443c2e;
 
-  --color-line: rgb(11 11 11 / 0.14);
-  --color-line-strong: rgb(11 11 11 / 0.26);
-  --color-line-accent: rgb(11 11 11 / 0.55);
-  --color-glass: rgb(242 238 228 / 0.78);
-  --color-shade: rgb(60 52 32 / 0.3);
+  --color-line: rgb(16 13 8 / 0.15);
+  --color-line-strong: rgb(16 13 8 / 0.28);
+  --color-line-accent: rgb(16 13 8 / 0.55);
+  --color-glass: rgb(236 228 211 / 0.8);
+  --color-shade: rgb(74 63 42 / 0.32);
+
+  /* The blueprint grid is drawn in white on black. On cream a white grid is
+     literally invisible, so it flips to a dark line — the same drawing, inked
+     onto paper instead of chalked onto a wall. */
+  --color-grid: rgb(16 13 8 / 0.055);
+
+  /* The cursor spotlight is additive light, which cannot darken. On cream it
+     has to become a warm stain that follows the pointer instead of a glow. */
+  --color-spot: rgb(74 63 42 / 0.13);
 
   /* Shadows on a light ground need to be far weaker and warmer than on black,
      or every card reads as a smudge. */
-  --shadow-soft: 0 24px 60px -34px rgb(60 52 32 / 0.35);
-  --shadow-panel: 0 1px 0 0 rgb(255 255 255 / 0.7) inset, 0 18px 40px -32px rgb(60 52 32 / 0.4);
-  --shadow-lift: 0 28px 60px -30px rgb(60 52 32 / 0.45), 0 0 0 1px rgb(11 11 11 / 0.28);
-  --shadow-glow: 0 0 50px -16px rgb(11 11 11 / 0.3);
+  --shadow-soft: 0 24px 60px -34px rgb(74 63 42 / 0.4);
+  --shadow-panel: 0 1px 0 0 rgb(255 255 255 / 0.6) inset, 0 18px 40px -32px rgb(74 63 42 / 0.42);
+  --shadow-lift: 0 28px 60px -30px rgb(74 63 42 / 0.48), 0 0 0 1px rgb(16 13 8 / 0.3);
+  --shadow-glow: 0 0 50px -16px rgb(16 13 8 / 0.32);
 }
 
 /* Dark is the default, but state it explicitly so the pair is symmetrical and
@@ -550,6 +568,22 @@
     background: radial-gradient(58% 58% at 50% 44%, #17140f 0%, #17140f 35%, transparent 72%);
   }
 
+  /* The drifting blooms read as light thrown onto a black wall. Inked onto
+     cream, three blooms at full strength would just be grey smudges, so they
+     drop to a fraction — an ink wash spreading on paper. */
+  [data-theme='light'] [data-hero-glow] {
+    opacity: 0.42;
+  }
+
+  /* Paper grain. Empty in the dark theme, where the background is meant to be
+     pure. In the cream theme a flat field reads as an unstyled page, and this
+     fine cross-hatch is what makes it read as paper instead. */
+  [data-theme='light'] [data-hero-grain] {
+    background-image:
+      repeating-linear-gradient(45deg, rgb(16 13 8 / 0.028) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(-45deg, rgb(16 13 8 / 0.028) 0 1px, transparent 1px 3px);
+  }
+
   /* Stack badges lift and stagger when their card is hovered. Transform-only,
      so the whole row animates on the compositor. */
   .stack-mark {
@@ -612,8 +646,8 @@
 
   .grid-field {
     background-image:
-      linear-gradient(to right, rgb(255 255 255 / 0.035) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+      linear-gradient(to right, var(--color-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-grid) 1px, transparent 1px);
     background-size: 72px 72px;
   }
 
