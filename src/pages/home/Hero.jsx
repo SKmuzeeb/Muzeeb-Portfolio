@@ -59,7 +59,6 @@ export default function Hero() {
       {/* ── Layer 0 · WebGL service mesh ─────────────────── */}
       <motion.div
         className="absolute inset-0"
-        data-hero-canvas=""
         style={{ scale: canvasScale, opacity: canvasOpacity, zIndex: -30 }}
       >
         <Suspense fallback={null}>

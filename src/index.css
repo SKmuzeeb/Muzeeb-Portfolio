@@ -555,13 +555,16 @@
   }
 
   /* ── Misc ─────────────────────────────────────────────── */
-  /* The WebGL mesh blends additively, so it can only ever *add* light — on a
-     cream ground it would simply wash out and disappear. In the light theme it
-     gets a soft dark pool to sit in, which keeps the glow legible without
-     putting a hard black box behind the headline. */
-  [data-theme='light'] [data-hero-canvas] {
-    background: radial-gradient(58% 58% at 50% 44%, #17140f 0%, #17140f 35%, transparent 72%);
-  }
+  /* There is deliberately NO dark pool behind the WebGL mesh in the light
+     theme. There used to be one — a #17140f radial gradient, 58% of the hero,
+     sitting dead centre — added on the theory that an additively blended mesh
+     needs a dark ground to be legible on cream.
+
+     It did make the mesh visible, and it also read as a black stain in the
+     middle of a paper-coloured hero: the one element on the page that looked
+     like a rendering fault rather than a decision. A faint glow is a far better
+     trade than that, so the pool is gone and the mesh is simply allowed to be
+     subtle on cream. */
 
   /* The drifting blooms read as light thrown onto a black wall. Inked onto
      cream, three blooms at full strength would just be grey smudges, so they

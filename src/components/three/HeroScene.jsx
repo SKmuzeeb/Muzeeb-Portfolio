@@ -204,7 +204,7 @@ function Mesh() {
   const s = Math.min(viewport.width, viewport.height) * 0.12
   // The offset is proportional for the same reason: a fixed world-space shift
   // would be a nudge on a desktop and most of the way off a phone.
-  const shiftX = viewport.width * 0.17
+  const shiftX = viewport.width * 0.25
   const shiftY = viewport.height * -0.02
 
   return (
